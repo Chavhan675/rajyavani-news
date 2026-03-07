@@ -1,103 +1,73 @@
 "use client"
 
-import React,{useEffect,useState} from "react"
-import {useSearchParams} from "next/navigation"
-import axios from "axios"
+export const dynamic = "force-dynamic"
 
-import NewsCard from "../../components/NewsCard"
+import { useState } from "react"
 
-const API="http://localhost:5000/api"
+export default function Signup() {
 
-export default function SearchPage(){
+  const [name,setName] = useState("")
+  const [email,setEmail] = useState("")
+  const [password,setPassword] = useState("")
 
-const searchParams=useSearchParams()
-const query=searchParams.get("q")
+  const handleSubmit = async (e)=>{
+    e.preventDefault()
 
-const [results,setResults]=useState([])
-const [loading,setLoading]=useState(true)
+    try{
 
-useEffect(()=>{
+      const res = await fetch(process.env.NEXT_PUBLIC_API_URL + "/auth/signup",{
+        method:"POST",
+        headers:{
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify({name,email,password})
+      })
 
-async function search(){
+      const data = await res.json()
 
-try{
+      alert(data.message)
 
-const res=await axios.get(`${API}/news/search?q=${query}`)
-setResults(res.data || [])
+    }catch(err){
+      console.log(err)
+    }
 
-}catch(e){
+  }
 
-setResults([])
+  return(
 
-}
+    <div className="authContainer">
 
-setLoading(false)
+      <h2>Create Account</h2>
 
-}
+      <form onSubmit={handleSubmit}>
 
-if(query) search()
+        <input
+        type="text"
+        placeholder="Name"
+        value={name}
+        onChange={(e)=>setName(e.target.value)}
+        />
 
-},[query])
+        <input
+        type="email"
+        placeholder="Email"
+        value={email}
+        onChange={(e)=>setEmail(e.target.value)}
+        />
 
-if(loading){
+        <input
+        type="password"
+        placeholder="Password"
+        value={password}
+        onChange={(e)=>setPassword(e.target.value)}
+        />
 
-return(
+        <button type="submit">Signup</button>
 
-<div style={{padding:"60px",textAlign:"center"}}>
-Searching news...
-</div>
+      </form>
 
-)
+    </div>
 
-}
-
-return(
-
-<div
-style={{
-maxWidth:"1200px",
-margin:"auto",
-padding:"20px"
-}}
->
-
-<h1
-style={{
-marginBottom:"20px"
-}}
->
-
-Search Results for "{query}"
-
-</h1>
-
-{results.length===0 && (
-
-<p>No news found</p>
-
-)}
-
-<div
-style={{
-display:"grid",
-gridTemplateColumns:"repeat(3,1fr)",
-gap:"15px"
-}}
->
-
-{results.map(news=>(
-
-<NewsCard
-key={news._id}
-news={news}
-/>
-
-))}
-
-</div>
-
-</div>
-
-)
+  )
 
 }
