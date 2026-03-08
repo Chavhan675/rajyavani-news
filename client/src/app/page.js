@@ -1,68 +1,69 @@
-import HeroSection from "@/components/HeroSection";
-import CategorySection from "@/components/CategorySection";
-import HeroSlider from "@/components/HeroSlider";
-import AdBanner from "@/components/AdBanner";
+"use client";
+
+import { useEffect, useState } from "react";
 
 export default function Home() {
+
+  const [news, setNews] = useState([]);   // never null
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+
+    const fetchNews = async () => {
+
+      try {
+
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/news`
+        );
+
+        const data = await res.json();
+
+        // make sure data is always array
+        setNews(Array.isArray(data) ? data : []);
+
+      } catch (error) {
+
+        console.error("Error fetching news:", error);
+        setNews([]);
+
+      } finally {
+
+        setLoading(false);
+
+      }
+
+    };
+
+    fetchNews();
+
+  }, []);
+
+  if (loading) {
+    return <p>Loading news...</p>;
+  }
 
   return (
 
     <div>
 
-      {/* Top Featured News */}
-      <HeroSection />
+      <h1>Latest News</h1>
 
-      {/* Category News Sections */}
+      {news.length === 0 ? (
+        <p>No news available</p>
+      ) : (
+        news.map((item) => (
 
-      <CategorySection
-        category="maharashtra"
-        title="महाराष्ट्र"
-      />
+          <div key={item._id}>
 
-      <CategorySection
-        category="politics"
-        title="राजकारण"
-      />
+            <h2>{item.title}</h2>
 
-      <CategorySection
-        category="sports"
-        title="क्रीडा"
-      />
+            <p>{item.content}</p>
 
-      <CategorySection
-        category="technology"
-        title="टेक्नॉलॉजी"
-      />
-      <HeroSlider />
+          </div>
 
-<CategorySection
-category="maharashtra"
-title="महाराष्ट्र"
-/>
-<HeroSlider />
-
-<AdBanner
-image="/ads/banner1.jpg"
-link="https://example.com"
-/>
-
-<CategorySection
-category="maharashtra"
-title="महाराष्ट्र"
-/>
-
-<AdBanner
-image="/ads/banner2.jpg"
-link="https://example.com"
-/>
-
-<CategorySection
-category="politics"
-title="राजकारण"
-/>
-      
-
-
+        ))
+      )}
 
     </div>
 
