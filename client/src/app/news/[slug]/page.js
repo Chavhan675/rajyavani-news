@@ -1,40 +1,42 @@
+import { getNewsBySlug } from "@/lib/api";
+
 export async function generateMetadata({ params }) {
 
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/news/${params.slug}`,
-    { cache: "no-store" }
-  );
-
-  const news = await res.json();
+  const article = await getNewsBySlug(params.slug);
 
   return {
-    title: news?.title || "Rajyavani",
-    description: news?.content?.slice(0,150) || "Latest Marathi News"
+    title: article?.title || "Rajyavani",
+    description: article?.content?.slice(0,150) || "Latest Marathi News"
   };
+
 }
 
 export default async function NewsPage({ params }) {
 
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/news/${params.slug}`,
-    { cache: "no-store" }
-  );
+  const article = await getNewsBySlug(params.slug);
 
-  const news = await res.json();
-
-  if (!news) {
+  if (!article) {
     return <div>News not found</div>;
   }
 
   return (
-    <div style={{maxWidth:"900px",margin:"40px auto"}}>
-      <h1>{news.title}</h1>
 
-      {news.image && (
-        <img src={news.image} alt={news.title} style={{width:"100%"}} />
+    <div style={{maxWidth:"900px",margin:"40px auto"}}>
+
+      <h1>{article.title}</h1>
+
+      {article.image && (
+        <img
+          src={article.image}
+          alt={article.title}
+          style={{width:"100%",margin:"20px 0"}}
+        />
       )}
 
-      <p>{news.content}</p>
+      <p>{article.content}</p>
+
     </div>
+
   );
+
 }
