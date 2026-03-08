@@ -1,84 +1,62 @@
-"use client"
+"use client";
 
-import React,{useState} from "react"
-import axios from "axios"
-import {useRouter} from "next/navigation"
+import { useState } from "react";
+import { loginUser } from "@/lib/api";
+import { useRouter } from "next/navigation";
 
-const API="http://localhost:5000/api"
+export default function LoginPage(){
 
-export default function Login(){
+  const router = useRouter();
 
-const router=useRouter()
+  const [email,setEmail] = useState("");
+  const [password,setPassword] = useState("");
 
-const [email,setEmail]=useState("")
-const [password,setPassword]=useState("")
-const [loading,setLoading]=useState(false)
+  const handleSubmit = async(e)=>{
+    e.preventDefault();
 
-async function handleSubmit(e){
+    try{
 
-e.preventDefault()
+      await loginUser({email,password});
 
-setLoading(true)
+      alert("Login successful");
 
-try{
+      router.push("/");
 
-const res=await axios.post(`${API}/auth/login`,{
-email,
-password
-})
+    }catch(err){
+      console.error(err);
+      alert("Login failed");
+    }
+  };
 
-localStorage.setItem("token",res.data.token)
+  return(
 
-alert("Login successful")
+    <div className="auth-page">
 
-router.push("/")
+      <h1>Login</h1>
 
-}catch(e){
+      <form onSubmit={handleSubmit} className="auth-form">
 
-alert("Login failed")
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e)=>setEmail(e.target.value)}
+        />
 
-}
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e)=>setPassword(e.target.value)}
+        />
 
-setLoading(false)
+        <button type="submit">
+          Login
+        </button>
 
-}
+      </form>
 
-return(
+    </div>
 
-<div style={{maxWidth:"500px",margin:"auto",padding:"40px"}}>
-
-<h1 style={{marginBottom:"20px"}}>Login</h1>
-
-<form onSubmit={handleSubmit}>
-
-<input
-placeholder="Email"
-value={email}
-onChange={(e)=>setEmail(e.target.value)}
-style={{width:"100%",padding:"10px",marginBottom:"10px"}}
-/>
-
-<input
-type="password"
-placeholder="Password"
-value={password}
-onChange={(e)=>setPassword(e.target.value)}
-style={{width:"100%",padding:"10px",marginBottom:"10px"}}
-/>
-
-<button
-type="submit"
-style={{padding:"10px 20px"}}
->
-
-{loading ? "Logging in..." : "Login"}
-
-</button>
-
-</form>
-
-</div>
-
-)
-
+  );
 }

@@ -1,108 +1,54 @@
-"use client"
+"use client";
 
-import React,{useEffect,useState} from "react"
-import axios from "axios"
-import Link from "next/link"
-import NewsCard from "./NewsCard"
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { getNewsByCategory } from "@/lib/api";
+import NewsCard from "./NewsCard";
 
-const API="http://localhost:5000/api"
+export default function CategorySection({ category, title }) {
 
-export default function CategorySection({slug,title}){
+  const [news, setNews] = useState([]);
 
-const [news,setNews]=useState([])
-const [loading,setLoading]=useState(true)
+  useEffect(() => {
 
-useEffect(()=>{
+    const loadNews = async () => {
+      try {
+        const res = await getNewsByCategory(category);
+        setNews(res.data.slice(0,4));
+      } catch (err) {
+        console.error(err);
+      }
+    };
 
-async function load(){
+    loadNews();
 
-try{
+  }, [category]);
 
-const res=await axios.get(`${API}/news/category/${slug}`)
-setNews(res.data.news || [])
+  if(news.length === 0) return null;
 
-}catch(e){
-setNews([])
-}
+  return (
 
-setLoading(false)
+    <section className="category-section">
 
-}
+      <div className="category-header">
 
-load()
+        <h2>{title}</h2>
 
-},[slug])
+        <Link href={`/category/${category}`}>
+          View All
+        </Link>
 
-if(loading) return null
-if(!news || news.length===0) return null
+      </div>
 
-return(
+      <div className="news-grid">
 
-<section
-style={{
-marginTop:"40px"
-}}
->
+        {news.map((item) => (
+          <NewsCard key={item._id} news={item} />
+        ))}
 
-<div
-style={{
-display:"flex",
-justifyContent:"space-between",
-alignItems:"center",
-marginBottom:"15px"
-}}
->
+      </div>
 
-<h2
-style={{
-fontSize:"22px",
-fontWeight:"700",
-borderLeft:"6px solid #e4002b",
-paddingLeft:"10px"
-}}
->
+    </section>
 
-{title}
-
-</h2>
-
-<Link
-href={`/category/${slug}`}
-style={{
-textDecoration:"none",
-fontSize:"14px",
-color:"#e4002b",
-fontWeight:"600"
-}}
->
-
-View All
-
-</Link>
-
-</div>
-
-<div
-style={{
-display:"grid",
-gridTemplateColumns:"repeat(3,1fr)",
-gap:"15px"
-}}
->
-
-{news.slice(0,6).map(item=>(
-
-<NewsCard
-key={item._id}
-news={item}
-/>
-
-))}
-
-</div>
-
-</section>
-
-)
-
+  );
 }

@@ -1,100 +1,49 @@
-"use client"
+"use client";
 
-import React,{useEffect,useState} from "react"
-import Link from "next/link"
-import axios from "axios"
-import {FaFire} from "react-icons/fa"
-
-const API="http://localhost:5000/api"
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { getLatestNews } from "@/lib/api";
 
 export default function BreakingNews(){
 
-const [breaking,setBreaking]=useState([])
+  const [news,setNews] = useState([]);
 
-useEffect(()=>{
+  useEffect(()=>{
 
-async function load(){
+    const loadNews = async()=>{
+      try{
+        const res = await getLatestNews();
+        setNews(res.data.slice(0,6));
+      }catch(err){
+        console.error(err);
+      }
+    };
 
-try{
+    loadNews();
 
-const res=await axios.get(`${API}/news/breaking`)
-setBreaking(res.data||[])
+  },[]);
 
-}catch(e){
-setBreaking([])
-}
+  if(news.length === 0) return null;
 
-}
+  return(
 
-load()
+    <div className="breaking-news">
 
-},[])
+      <span className="breaking-label">
+        BREAKING
+      </span>
 
-if(!breaking||breaking.length===0)return null
+      <div className="breaking-scroll">
 
-return(
+        {news.map((item)=>(
+          <Link key={item._id} href={`/news/${item.slug}`}>
+            {item.title}
+          </Link>
+        ))}
 
-<div
-style={{
-width:"100%",
-background:"#000",
-color:"#fff",
-display:"flex",
-alignItems:"center",
-padding:"8px 0"
-}}
->
+      </div>
 
-<div
-style={{
-display:"flex",
-alignItems:"center",
-gap:"6px",
-background:"#e4002b",
-padding:"6px 12px",
-fontWeight:"600"
-}}
->
+    </div>
 
-<FaFire/>
-BREAKING
-
-</div>
-
-<div
-style={{
-flex:1,
-overflow:"hidden",
-whiteSpace:"nowrap"
-}}
->
-
-<marquee>
-
-{breaking.map((n)=>(
-<span key={n._id} style={{marginRight:"40px"}}>
-
-<Link
-href={`/news/${n.slug}`}
-style={{
-color:"#fff",
-textDecoration:"none"
-}}
->
-
-{n.title}
-
-</Link>
-
-</span>
-))}
-
-</marquee>
-
-</div>
-
-</div>
-
-)
-
+  );
 }

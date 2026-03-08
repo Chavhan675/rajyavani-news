@@ -1,16 +1,39 @@
-const express = require("express")
-const router = express.Router()
+const express = require("express");
+const router = express.Router();
+const News = require("../models/News");
 
-router.get("/", (req, res) => {
-  res.json({
-    message: "News API working",
-    news: [
-      {
-        title: "Rajyavani News Portal Launched",
-        content: "This is a demo news article"
-      }
-    ]
-  })
-})
+router.get("/", async(req,res)=>{
 
-module.exports = router
+const news = await News
+.find()
+.sort({createdAt:-1})
+.limit(20)
+.lean();
+
+res.json(news);
+
+});
+
+router.get("/category/:category", async(req,res)=>{
+
+const news = await News
+.find({category:req.params.category})
+.sort({createdAt:-1})
+.limit(10)
+.lean();
+
+res.json(news);
+
+});
+
+router.get("/:slug", async(req,res)=>{
+
+const news = await News
+.findOne({slug:req.params.slug})
+.lean();
+
+res.json(news);
+
+});
+
+module.exports = router;

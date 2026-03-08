@@ -1,28 +1,63 @@
-"use client"
+"use client";
 
-export const dynamic = "force-dynamic"
+import { useState } from "react";
+import { searchNews } from "@/lib/api";
+import NewsCard from "@/components/NewsCard";
 
-import { useState } from "react"
+export default function SearchPage() {
 
-export default function Search(){
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState([]);
 
-  const [query,setQuery] = useState("")
+  const handleSearch = async (e) => {
 
-  return(
+    e.preventDefault();
 
-    <div className="container">
+    if(!query) return;
 
-      <h2>Search News</h2>
+    try{
 
-      <input
-      type="text"
-      placeholder="Search..."
-      value={query}
-      onChange={(e)=>setQuery(e.target.value)}
-      />
+      const res = await searchNews(query);
+      setResults(res.data);
+
+    }catch(err){
+      console.error(err);
+    }
+
+  };
+
+  return (
+
+    <div className="search-page">
+
+      <h1>Search News</h1>
+
+      <form onSubmit={handleSearch} className="search-form">
+
+        <input
+          type="text"
+          placeholder="Search news..."
+          value={query}
+          onChange={(e)=>setQuery(e.target.value)}
+        />
+
+        <button type="submit">
+          Search
+        </button>
+
+      </form>
+
+
+      <div className="news-grid">
+
+        {results.map((news)=>(
+          <NewsCard key={news._id} news={news}/>
+        ))}
+
+      </div>
 
     </div>
 
-  )
+  );
 
 }

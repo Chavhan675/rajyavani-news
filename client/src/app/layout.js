@@ -1,38 +1,31 @@
-import "./globals.css"
-
-import Navbar from "../components/Navbar"
-import Footer from "../components/Footer"
-import BreakingNews from "../components/BreakingNews"
+import "./globals.css";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import BreakingNews from "@/components/BreakingNews";
 
 export const metadata = {
-title: "राज्यवाणी | Marathi News Portal",
-description: "Latest Marathi News"
-}
+  title: "Rajyavani - Marathi News Portal",
+  description:
+    "Rajyavani delivers latest Marathi news from Maharashtra, politics, sports, technology and more.",
+  keywords:
+    "Marathi news, Maharashtra news, politics news, sports news, technology news",
+};
 
 export default function RootLayout({ children }) {
+  return (
+    <html lang="mr">
+      <body>
 
-return (
+        <Navbar />
+        <BreakingNews />
 
-<html lang="en">
+        <main className="container">
+          {children}
+        </main>
 
-<body className="bg-gray-100">
+        <Footer />
 
-<Navbar />
-
-<BreakingNews />
-
-<main className="max-w-7xl mx-auto px-4 py-6">
-
-{children}
-
-</main>
-
-<Footer />
-
-</body>
-
-</html>
-
-)
-
+      </body>
+    </html>
+  );
 }

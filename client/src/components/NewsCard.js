@@ -1,31 +1,71 @@
-import Link from "next/link"
+"use client";
 
-export default function NewsCard({news}){
+import Link from "next/link";
 
-return(
+export default function NewsCard({ news }) {
 
-<div className="news-card">
+  if (!news) return null;
 
-<img
-className="news-image"
-src={news.image ? `http://localhost:5000/uploads/${news.image}` : "https://via.placeholder.com/400x200"}
-alt={news.title}
+  return (
+    <article className="news-card">
+
+      <Link href={`/news/${news.slug}`}>
+
+        <div className="news-image">
+          <img
+            src={news.image || "/default-news.jpg"}
+            alt={news.title}
+          />
+        </div>
+
+        <div className="news-content">
+
+          {/* category */}
+          {news.category && (
+            <span className="news-category">
+              {news.category}
+            </span>
+          )}
+
+          {/* title */}
+          <h3 className="news-title">
+            {news.title}
+          </h3>
+
+          {/* description */}
+          {news.excerpt && (
+            <p className="news-excerpt">
+              {news.excerpt}
+            </p>
+          )}
+          import Image from "next/image";
+
+<Image
+  src={news.image}
+  alt={news.title}
+  width={600}
+  height={400}
 />
 
-<div className="news-content">
+          {/* meta */}
+          <div className="news-meta">
 
-<Link href={`/news/${news.slug}`} className="news-title">
-{news.title}
-</Link>
+            {news.author && (
+              <span>{news.author}</span>
+            )}
 
-<div className="news-date">
-🕒 {new Date(news.createdAt).toLocaleDateString()}
-</div>
+            {news.createdAt && (
+              <span>
+                {new Date(news.createdAt).toLocaleDateString()}
+              </span>
+            )}
 
-</div>
+          </div>
 
-</div>
+        </div>
 
-)
+      </Link>
 
+    </article>
+  );
 }

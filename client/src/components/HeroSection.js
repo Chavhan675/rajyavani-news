@@ -1,91 +1,93 @@
-"use client"
+"use client";
 
-import {useEffect,useState} from "react"
-import axios from "axios"
-import Link from "next/link"
-import Image from "next/image"
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { getLatestNews } from "@/lib/api";
 
-const API="http://localhost:5000/api"
-const IMG="http://localhost:5000/uploads"
+export default function HeroSection() {
 
-export default function HeroSection(){
+  const [news, setNews] = useState([]);
 
-const [news,setNews]=useState([])
+  useEffect(() => {
 
-useEffect(()=>{
+    const loadNews = async () => {
+      try {
+        const res = await getLatestNews();
+        setNews(res.data.slice(0,5));
+      } catch (err) {
+        console.error(err);
+      }
+    };
 
-async function load(){
+    loadNews();
 
-try{
+  }, []);
 
-const res=await axios.get(`${API}/news/latest`)
-setNews(res.data.slice(0,5))
+  if(news.length === 0) return null;
 
-}catch(e){
+  const mainNews = news[0];
+  const sideNews = news.slice(1);
 
-setNews([])
+  return (
+    <section className="hero-section">
 
-}
-
-}
-
-load()
-
-},[])
-
-if(news.length===0) return null
-
-const main=news[0]
-const side=news.slice(1,5)
-
-return(
-
-<div className="hero-grid">
-
-<div className="hero-main">
-
-<Link href={`/news/${main.slug}`}>
+      {/* main news */}
+      import Image from "next/image";
 
 <Image
-src={main.image ? `${IMG}/${main.image}` : "https://via.placeholder.com/800x500"}
-width={800}
-height={500}
-alt={main.title}
+  src={news.image}
+  alt={news.title}
+  width={600}
+  height={400}
 />
 
-<h2>{main.title}</h2>
+      <div className="hero-main">
 
-</Link>
+        <Link href={`/news/${mainNews.slug}`}>
 
-</div>
+          <img
+            src={mainNews.image}
+            alt={mainNews.title}
+          />
 
-<div className="hero-side">
+          <div className="hero-overlay">
 
-{side.map(item=>(
+            <h1>
+              {mainNews.title}
+            </h1>
 
-<div key={item._id}>
+          </div>
 
-<Link href={`/news/${item.slug}`}>
+        </Link>
 
-<Image
-src={item.image ? `${IMG}/${item.image}` : "https://via.placeholder.com/400x250"}
-width={400}
-height={250}
-alt={item.title}
-/>
+      </div>
 
-<p>{item.title}</p>
 
-</Link>
+      {/* side news */}
 
-</div>
+      <div className="hero-side">
 
-))}
+        {sideNews.map((item) => (
 
-</div>
+          <Link key={item._id} href={`/news/${item.slug}`}>
 
-</div>
+            <div className="hero-small">
 
-)
+              <img
+                src={item.image}
+                alt={item.title}
+              />
 
+              <p>{item.title}</p>
+
+            </div>
+
+          </Link>
+
+        ))}
+
+      </div>
+
+    </section>
+  );
 }

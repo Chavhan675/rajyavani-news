@@ -1,135 +1,91 @@
-"use client"
+"use client";
 
-import React,{useEffect,useState} from "react"
-import axios from "axios"
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { getAdminNews, deleteNews } from "@/lib/api";
 
-const API="http://localhost:5000/api"
+export default function AdminDashboard() {
 
-export default function AdminPanel(){
+  const [news, setNews] = useState([]);
 
-const [news,setNews]=useState([])
-const [loading,setLoading]=useState(true)
+  useEffect(() => {
 
-useEffect(()=>{
+    const loadNews = async () => {
+      try{
+        const res = await getAdminNews();
+        setNews(res.data);
+      }catch(err){
+        console.error(err);
+      }
+    };
 
-async function load(){
+    loadNews();
 
-const token=localStorage.getItem("token")
+  }, []);
 
-if(!token){
-setLoading(false)
-return
-}
 
-try{
 
-const res=await axios.get(`${API}/admin/news`,{
-headers:{
-Authorization:`Bearer ${token}`
-}
-})
+  const handleDelete = async (id) => {
 
-setNews(res.data)
+    if(!confirm("Delete this news?")) return;
 
-}catch(e){
+    try{
 
-setNews([])
+      await deleteNews(id);
 
-}
+      setNews(news.filter(n => n._id !== id));
 
-setLoading(false)
+    }catch(err){
+      console.error(err);
+    }
 
-}
+  };
 
-load()
 
-},[])
 
-async function approve(id){
+  return (
 
-const token=localStorage.getItem("token")
+    <div className="admin-dashboard">
 
-try{
+      <h1>Admin Dashboard</h1>
 
-await axios.put(`${API}/admin/approve/${id}`,{},{
-headers:{
-Authorization:`Bearer ${token}`
-}
-})
+      <Link href="/admin/create-news" className="create-btn">
+        + Create News
+      </Link>
 
-window.location.reload()
 
-}catch(e){
+      <div className="admin-news-list">
 
-alert("Failed")
+        {news.map((item)=>(
 
-}
+          <div key={item._id} className="admin-news-card">
 
-}
+            <h3>{item.title}</h3>
 
-if(loading){
+            <p>{item.category}</p>
 
-return(
+            <div className="admin-actions">
 
-<div style={{padding:"60px",textAlign:"center"}}>
-Loading Admin Panel...
-</div>
+              <Link href={`/news/${item.slug}`}>
+                View
+              </Link>
 
-)
+              <button
+                onClick={()=>handleDelete(item._id)}
+              >
+                Delete
+              </button>
 
-}
+            </div>
 
-return(
+          </div>
 
-<div style={{maxWidth:"1000px",margin:"auto",padding:"30px"}}>
+        ))}
 
-<h1 style={{marginBottom:"20px"}}>Admin News Approval</h1>
+      </div>
 
-<table style={{width:"100%"}}>
+    </div>
 
-<thead>
-
-<tr>
-<th>Title</th>
-<th>Status</th>
-<th>Action</th>
-</tr>
-
-</thead>
-
-<tbody>
-
-{news.map(n=>(
-
-<tr key={n._id}>
-
-<td>{n.title}</td>
-
-<td>{n.status}</td>
-
-<td>
-
-<button
-onClick={()=>approve(n._id)}
-style={{padding:"6px 12px"}}
->
-
-Approve
-
-</button>
-
-</td>
-
-</tr>
-
-))}
-
-</tbody>
-
-</table>
-
-</div>
-
-)
+  );
 
 }

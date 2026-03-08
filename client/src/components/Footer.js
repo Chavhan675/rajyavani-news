@@ -1,77 +1,71 @@
-import Link from "next/link"
+import Link from "next/link";
 
-export default function Footer(){
+export default function Footer() {
 
-return(
+  return (
 
-<footer className="footer">
+    <footer className="footer">
 
-<div className="footer-container">
+      <div className="footer-container">
 
-<div className="footer-col">
+        {/* Logo + About */}
 
-<h2 className="footer-logo">राज्यवाणी</h2>
+        <div className="footer-about">
 
-<p>
-राज्यवाणी हे एक आधुनिक मराठी न्यूज पोर्टल आहे जे महाराष्ट्र
-आणि भारतातील ताज्या बातम्या वाचकांपर्यंत पोहोचवते.
-</p>
+          <h2>Rajyavani</h2>
 
-<div className="social">
+          <p>
+            Rajyavani is a Marathi news platform delivering
+            latest updates on Maharashtra, politics, sports,
+            technology and more.
+          </p>
 
-<span>📘</span>
-<span>🐦</span>
-<span>▶</span>
-<span>💬</span>
+        </div>
 
-</div>
 
-</div>
+        {/* Categories */}
 
-<div className="footer-col">
+        <div className="footer-links">
 
-<h3>Categories</h3>
+          <h3>Categories</h3>
 
-<Link href="/category/maharashtra">महाराष्ट्र</Link>
-<Link href="/category/politics">राजकारण</Link>
-<Link href="/category/sports">क्रीडा</Link>
-<Link href="/category/business">व्यवसाय</Link>
-<Link href="/category/technology">तंत्रज्ञान</Link>
+          <Link href="/category/maharashtra">महाराष्ट्र</Link>
+          <Link href="/category/india">भारत</Link>
+          <Link href="/category/politics">राजकारण</Link>
+          <Link href="/category/sports">क्रीडा</Link>
+          <Link href="/category/technology">टेक</Link>
 
-</div>
+        </div>
 
-<div className="footer-col">
 
-<h3>Quick Links</h3>
+        {/* Pages */}
 
-<Link href="/">Home</Link>
-<Link href="/login">Login</Link>
-<Link href="/signup">Signup</Link>
-<Link href="/submit-news">Submit News</Link>
-<Link href="/dashboard">Dashboard</Link>
+        <div className="footer-links">
 
-</div>
+          <h3>Pages</h3>
 
-<div className="footer-col">
+          <Link href="/">Home</Link>
+          <Link href="/search">Search</Link>
+          <Link href="/login">Login</Link>
+          <Link href="/register">Register</Link>
 
-<h3>Contact</h3>
+        </div>
 
-<p>Email: rajyavani.news@gmail.com</p>
-<p>Phone: +91 0000000000</p>
-<p>Maharashtra, India</p>
+      </div>
 
-</div>
 
-</div>
+      {/* Bottom */}
 
-<div className="footer-bottom">
+      <div className="footer-bottom">
 
-© 2026 Rajyavani Marathi News Portal
+        <p>
+          © {new Date().getFullYear()} Rajyavani News.
+          All rights reserved.
+        </p>
 
-</div>
+      </div>
 
-</footer>
+    </footer>
 
-)
-
+  );
 }

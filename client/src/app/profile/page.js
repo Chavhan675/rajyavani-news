@@ -1,19 +1,39 @@
-"use client"
+"use client";
 
-export const dynamic = "force-dynamic"
+import { useEffect, useState } from "react";
+import { getProfile } from "@/lib/api";
 
-export default function Profile(){
+export default function ProfilePage(){
+
+  const [user,setUser] = useState(null);
+
+  useEffect(()=>{
+
+    const loadUser = async()=>{
+      try{
+        const res = await getProfile();
+        setUser(res.data);
+      }catch(err){
+        console.error(err);
+      }
+    };
+
+    loadUser();
+
+  },[]);
+
+  if(!user) return <p>Loading...</p>;
 
   return(
 
-    <div className="container">
+    <div className="profile-page">
 
-      <h2>User Profile</h2>
+      <h1>My Profile</h1>
 
-      <p>User information will appear here.</p>
+      <p><b>Name:</b> {user.name}</p>
+      <p><b>Email:</b> {user.email}</p>
 
     </div>
 
-  )
-
+  );
 }

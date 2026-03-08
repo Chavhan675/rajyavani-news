@@ -4,77 +4,35 @@ require("dotenv").config();
 const Category = require("../models/Category");
 
 mongoose.connect(process.env.MONGO_URI)
-.then(()=>console.log("MongoDB Connected"))
-.catch(err=>console.log(err));
+.then(()=>console.log("DB connected"));
 
-async function seedCategories(){
+const categories = [
+{ name:"Maharashtra", slug:"maharashtra" },
+{ name:"Politics", slug:"politics" },
+{ name:"Sports", slug:"sports" },
+{ name:"Technology", slug:"technology" }
+];
+
+const seedCategories = async()=>{
 
 try{
 
-await Category.deleteMany({});
-
-const categories = [
-
-{
-name:"महाराष्ट्र",
-slug:"maharashtra"
-},
-
-{
-name:"राजकारण",
-slug:"politics"
-},
-
-{
-name:"गुन्हे",
-slug:"crime"
-},
-
-{
-name:"क्रीडा",
-slug:"sports"
-},
-
-{
-name:"मनोरंजन",
-slug:"entertainment"
-},
-
-{
-name:"व्यवसाय",
-slug:"business"
-},
-
-{
-name:"तंत्रज्ञान",
-slug:"technology"
-},
-
-{
-name:"शिक्षण",
-slug:"education"
-},
-
-{
-name:"नोकरी",
-slug:"jobs"
-}
-
-];
+await Category.deleteMany();
 
 await Category.insertMany(categories);
 
-console.log("Categories inserted successfully");
+console.log("Categories seeded");
 
 process.exit();
 
 }catch(err){
 
-console.log(err);
-process.exit();
+console.error(err);
+
+process.exit(1);
 
 }
 
-}
+};
 
 seedCategories();

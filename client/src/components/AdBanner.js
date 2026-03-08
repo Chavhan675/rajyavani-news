@@ -1,47 +1,22 @@
-"use client"
+"use client";
 
-import React from "react"
+export default function AdBanner({ image, link }) {
 
-export default function AdBanner({size="horizontal"}){
+  return (
 
-let style={}
+    <div className="ad-banner">
 
-if(size==="horizontal"){
-style={
-width:"100%",
-height:"90px",
-background:"#eee",
-display:"flex",
-alignItems:"center",
-justifyContent:"center",
-margin:"20px 0",
-fontWeight:"600",
-fontSize:"18px",
-borderRadius:"6px"
-}
-}
+      <a href={link} target="_blank">
 
-if(size==="sidebar"){
-style={
-width:"100%",
-height:"250px",
-background:"#eee",
-display:"flex",
-alignItems:"center",
-justifyContent:"center",
-marginBottom:"20px",
-fontWeight:"600",
-fontSize:"18px",
-borderRadius:"6px"
-}
-}
+        <img
+          src={image}
+          alt="Advertisement"
+        />
 
-return(
+      </a>
 
-<div style={style}>
-Advertisement
-</div>
+    </div>
 
-)
+  );
 
 }

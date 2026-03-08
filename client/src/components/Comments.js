@@ -1,128 +1,98 @@
-"use client"
+"use client";
 
-import React,{useState,useEffect} from "react"
-import axios from "axios"
+import { useEffect, useState } from "react";
+import { addComment, getComments } from "@/lib/api";
 
-const API="http://localhost:5000/api"
+export default function Comments({ newsId }) {
 
-export default function Comments({newsId}){
+  const [comments, setComments] = useState([]);
+  const [text, setText] = useState("");
 
-const [comments,setComments]=useState([])
-const [text,setText]=useState("")
-const [loading,setLoading]=useState(false)
+  useEffect(() => {
 
-useEffect(()=>{
+    const loadComments = async () => {
 
-async function load(){
+      try{
+        const res = await getComments(newsId);
+        setComments(res.data);
+      }catch(err){
+        console.error(err);
+      }
 
-try{
+    };
 
-const res=await axios.get(`${API}/comments/${newsId}`)
-setComments(res.data)
+    loadComments();
 
-}catch(e){
+  }, [newsId]);
 
-setComments([])
 
-}
 
-}
+  const handleSubmit = async (e) => {
 
-if(newsId) load()
+    e.preventDefault();
 
-},[newsId])
+    if(!text) return;
 
-async function addComment(e){
+    try{
 
-e.preventDefault()
+      const res = await addComment({
+        newsId,
+        text
+      });
 
-const token=localStorage.getItem("token")
+      setComments([res.data, ...comments]);
+      setText("");
 
-if(!token){
-alert("Login required")
-return
-}
+    }catch(err){
+      console.error(err);
+    }
 
-setLoading(true)
+  };
 
-try{
 
-await axios.post(`${API}/comments`,{
 
-newsId,
-text
+  return (
 
-},{
-headers:{
-Authorization:`Bearer ${token}`
-}
-})
+    <div className="comments">
 
-setText("")
-window.location.reload()
+      <h2>Comments</h2>
 
-}catch(e){
+      <form onSubmit={handleSubmit} className="comment-form">
 
-alert("Failed")
+        <textarea
+          placeholder="Write your comment..."
+          value={text}
+          onChange={(e)=>setText(e.target.value)}
+        />
 
-}
+        <button type="submit">
+          Post Comment
+        </button>
 
-setLoading(false)
+      </form>
 
-}
 
-return(
 
-<div style={{marginTop:"40px"}}>
+      <div className="comment-list">
 
-<h3 style={{marginBottom:"10px"}}>Comments</h3>
+        {comments.map((c)=>(
+          <div key={c._id} className="comment">
 
-<form onSubmit={addComment}>
+            <p className="comment-text">
+              {c.text}
+            </p>
 
-<textarea
-placeholder="Write comment..."
-value={text}
-onChange={(e)=>setText(e.target.value)}
-style={{
-width:"100%",
-padding:"10px",
-height:"80px",
-marginBottom:"10px"
-}}
-/>
+            <span className="comment-date">
+              {new Date(c.createdAt).toLocaleDateString()}
+            </span>
 
-<button style={{padding:"8px 20px"}}>
+          </div>
+        ))}
 
-{loading ? "Posting..." : "Post Comment"}
+      </div>
 
-</button>
+    </div>
 
-</form>
-
-<div style={{marginTop:"20px"}}>
-
-{comments.map(c=>(
-
-<div
-key={c._id}
-style={{
-borderBottom:"1px solid #eee",
-padding:"10px 0"
-}}
->
-
-<b>{c.user?.name}</b>
-
-<p>{c.text}</p>
-
-</div>
-
-))}
-
-</div>
-
-</div>
-
-)
+  );
 
 }

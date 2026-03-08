@@ -1,169 +1,131 @@
-"use client"
+"use client";
+export async function generateMetadata({ params }) {
 
-import React,{useEffect,useState} from "react"
-import axios from "axios"
-import {useParams} from "next/navigation"
-import Image from "next/image"
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/news/${params.slug}`
+  );
 
-import AdBanner from "../../../components/AdBanner"
-import NewsCard from "../../../components/NewsCard"
+  const news = await res.json();
 
-const API="http://localhost:5000/api"
-const IMG="http://localhost:5000/uploads"
-
-export default function NewsArticle(){
-
-const params=useParams()
-const slug=params.slug
-
-const [news,setNews]=useState(null)
-const [related,setRelated]=useState([])
-const [loading,setLoading]=useState(true)
-
-useEffect(()=>{
-
-async function load(){
-
-try{
-
-const res=await axios.get(`${API}/news/${slug}`)
-setNews(res.data)
-
-const rel=await axios.get(`${API}/news/category/${res.data.category.slug}`)
-setRelated(rel.data.news || [])
-
-}catch(e){
-
-setNews(null)
-
+  return {
+    title: news.title,
+    description: news.excerpt || news.title,
+  };
 }
 
-setLoading(false)
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import { getNewsBySlug, getRelatedNews } from "@/lib/api";
+import NewsCard from "@/components/NewsCard";
+import Comments from "@/components/Comments";
+import AdBanner from "@/components/AdBanner";
 
-}
+export default function NewsPage() {
 
-if(slug) load()
+  const { slug } = useParams();
 
-},[slug])
+  const [news, setNews] = useState(null);
+  const [related, setRelated] = useState([]);
 
-if(loading){
+  useEffect(() => {
 
-return(
+    const loadNews = async () => {
 
-<div style={{padding:"60px",textAlign:"center"}}>
-Loading Article...
-</div>
+      try {
 
-)
+        const res = await getNewsBySlug(slug);
+        setNews(res.data);
 
-}
+        if(res.data.category){
+          const relatedRes = await getRelatedNews(res.data.category);
+          setRelated(relatedRes.data.slice(0,3));
+        }
 
-if(!news){
+      } catch(err){
+        console.error(err);
+      }
 
-return(
+    };
 
-<div style={{padding:"60px",textAlign:"center"}}>
-Article not found
-</div>
+    loadNews();
 
-)
+  }, [slug]);
 
-}
+  if(!news) return <p>Loading...</p>;
 
-return(
+  return (
 
-<div style={{maxWidth:"1200px",margin:"auto",padding:"20px"}}>
+    <article className="article-page">
 
-<h1
-style={{
-fontSize:"32px",
-fontWeight:"700",
-marginBottom:"10px"
-}}
->
+      {/* title */}
 
-{news.title}
+      <h1 className="article-title">
+        {news.title}
+      </h1>
 
-</h1>
 
-<div
-style={{
-fontSize:"14px",
-color:"#777",
-marginBottom:"20px"
-}}
->
+      {/* meta */}
 
-{new Date(news.createdAt).toLocaleDateString()}
+      <div className="article-meta">
 
-</div>
+        {news.author && <span>{news.author}</span>}
 
-<Image
-src={
-news.image
-? `${IMG}/${news.image}`
-: "https://via.placeholder.com/800x400"
-}
-width={800}
-height={400}
-alt={news.title}
-style={{
-width:"100%",
-height:"400px",
-objectFit:"cover",
-borderRadius:"6px"
-}}
+        {news.createdAt && (
+          <span>
+            {new Date(news.createdAt).toLocaleDateString()}
+          </span>
+        )}
+
+      </div>
+
+
+      {/* image */}
+
+      {news.image && (
+        <img
+          src={news.image}
+          alt={news.title}
+          className="article-image"
+        />
+      )}
+
+
+      {/* content */}
+
+      <div
+        className="article-content"
+        dangerouslySetInnerHTML={{ __html: news.content }}
+      />
+      <Comments newsId={news._id} />
+      <AdBanner
+image="/ads/article-ad.jpg"
+link="https://example.com"
 />
 
-<div
-style={{
-marginTop:"20px",
-fontSize:"18px",
-lineHeight:"1.7"
-}}
->
 
-{news.content}
+      {/* related news */}
 
-</div>
+      {related.length > 0 && (
 
-<AdBanner size="horizontal"/>
+        <section className="related-news">
 
-<h2
-style={{
-marginTop:"40px",
-marginBottom:"15px"
-}}
->
+          <h2>Related News</h2>
 
-Related News
+          <div className="news-grid">
 
-</h2>
+            {related.map((item) => (
+              <NewsCard key={item._id} news={item} />
+            ))}
 
-<div
-style={{
-display:"grid",
-gridTemplateColumns:"repeat(3,1fr)",
-gap:"15px"
-}}
->
+          </div>
 
-{related
-.filter(item=>item.slug!==news.slug)
-.slice(0,6)
-.map(item=>(
+        </section>
 
-<NewsCard
-key={item._id}
-news={item}
-/>
+      )}
 
-))}
+    </article>
 
-</div>
 
-</div>
-
-)
+  );
 
 }

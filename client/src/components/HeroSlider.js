@@ -1,36 +1,68 @@
-import Link from "next/link"
+"use client";
 
-export default function HeroSlider({news}){
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { getTrendingNews } from "@/lib/api";
 
-if(!news || news.length === 0) return null
+export default function HeroSlider(){
 
-const featured = news[0]
+  const [news,setNews] = useState([]);
+  const [index,setIndex] = useState(0);
 
-return(
+  useEffect(()=>{
 
-<div className="mb-6">
+    const loadNews = async()=>{
+      try{
+        const res = await getTrendingNews();
+        setNews(res.data.slice(0,5));
+      }catch(err){
+        console.error(err);
+      }
+    };
 
-<div className="relative">
+    loadNews();
 
-<img
-src={featured.image ? `http://localhost:5000/uploads/${featured.image}` : "https://via.placeholder.com/1200x400"}
-className="w-full h-[300px] object-cover rounded"
+  },[]);
+
+  useEffect(()=>{
+
+    const interval = setInterval(()=>{
+      setIndex((prev)=> (prev + 1) % news.length);
+    },5000);
+
+    return ()=> clearInterval(interval);
+
+  },[news]);
+
+  if(news.length === 0) return null;
+
+  const item = news[index];
+
+  return(
+
+    <div className="hero-slider">
+
+      <Link href={`/news/${item.slug}`}>
+
+        <img
+          src={item.image}
+          alt={item.title}
+        />
+
+        <div className="slider-overlay">
+          <h2>{item.title}</h2>
+        </div>
+
+      </Link>
+import Image from "next/image";
+
+<Image
+  src={news.image}
+  alt={news.title}
+  width={600}
+  height={400}
 />
+    </div>
 
-<div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white p-4">
-
-<Link href={`/news/${featured.slug}`}>
-<h2 className="text-3xl font-bold">
-{featured.title}
-</h2>
-</Link>
-
-</div>
-
-</div>
-
-</div>
-
-)
-
+  );
 }
