@@ -1,130 +1,80 @@
-"use client";
 export async function generateMetadata({ params }) {
 
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/news/${params.slug}`
-  );
+  try {
 
-  const news = await res.json();
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/news/${params.slug}`,
+      { cache: "no-store" }
+    );
 
-  return {
-    title: news.title,
-    description: news.excerpt || news.title,
-  };
-}
+    const news = await res.json();
 
-import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-import { getNewsBySlug, getRelatedNews } from "@/lib/api";
-import NewsCard from "@/components/NewsCard";
-import Comments from "@/components/Comments";
-import AdBanner from "@/components/AdBanner";
-
-export default function NewsPage() {
-
-  const { slug } = useParams();
-
-  const [news, setNews] = useState(null);
-  const [related, setRelated] = useState([]);
-
-  useEffect(() => {
-
-    const loadNews = async () => {
-
-      try {
-
-        const res = await getNewsBySlug(slug);
-        setNews(res.data);
-
-        if(res.data.category){
-          const relatedRes = await getRelatedNews(res.data.category);
-          setRelated(relatedRes.data.slice(0,3));
-        }
-
-      } catch(err){
-        console.error(err);
-      }
-
+    return {
+      title: news?.title || "Rajyavani News",
+      description: news?.content?.slice(0,150) || "Latest Marathi News"
     };
 
-    loadNews();
+  } catch (error) {
 
-  }, [slug]);
+    return {
+      title: "Rajyavani News",
+      description: "Latest Marathi News"
+    };
 
-  if(!news) return <p>Loading...</p>;
+  }
+
+}
+
+export default async function NewsPage({ params }) {
+
+  let news = null;
+
+  try {
+
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/news/${params.slug}`,
+      { cache: "no-store" }
+    );
+
+    news = await res.json();
+
+  } catch (error) {
+
+    console.error("News fetch error:", error);
+
+  }
+
+  if (!news) {
+    return (
+      <div style={{padding:"40px"}}>
+        <h1>News not found</h1>
+      </div>
+    );
+  }
 
   return (
 
-    <article className="article-page">
+    <div style={{maxWidth:"900px",margin:"40px auto"}}>
 
-      {/* title */}
+      <h1>{news.title}</h1>
 
-      <h1 className="article-title">
-        {news.title}
-      </h1>
-
-
-      {/* meta */}
-
-      <div className="article-meta">
-
-        {news.author && <span>{news.author}</span>}
-
-        {news.createdAt && (
-          <span>
-            {new Date(news.createdAt).toLocaleDateString()}
-          </span>
-        )}
-
-      </div>
-
-
-      {/* image */}
+      <p style={{color:"gray"}}>
+        {news.author} • {new Date(news.createdAt).toLocaleDateString()}
+      </p>
 
       {news.image && (
         <img
           src={news.image}
           alt={news.title}
-          className="article-image"
+          style={{width:"100%",margin:"20px 0"}}
         />
       )}
 
+      <p style={{lineHeight:"1.8"}}>
+        {news.content}
+      </p>
 
-      {/* content */}
-
-      <div
-        className="article-content"
-        dangerouslySetInnerHTML={{ __html: news.content }}
-      />
-      <Comments newsId={news._id} />
-      <AdBanner
-image="/ads/article-ad.jpg"
-link="https://example.com"
-/>
-
-
-      {/* related news */}
-
-      {related.length > 0 && (
-
-        <section className="related-news">
-
-          <h2>Related News</h2>
-
-          <div className="news-grid">
-
-            {related.map((item) => (
-              <NewsCard key={item._id} news={item} />
-            ))}
-
-          </div>
-
-        </section>
-
-      )}
-
-    </article>
-
+    </div>
 
   );
 

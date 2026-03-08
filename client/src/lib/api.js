@@ -6,7 +6,23 @@ const API = axios.create({
 });
 
 export default API;
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
+export async function getNews() {
+
+  const res = await fetch(`${API_URL}/api/news`);
+
+  return res.json();
+
+}
+
+export async function getNewsBySlug(slug) {
+
+  const res = await fetch(`${API_URL}/api/news/${slug}`);
+
+  return res.json();
+
+}
 
 /* ================= NEWS ================= */
 
