@@ -1,13 +1,17 @@
 "use client"
 
-import { useEffect,useState } from "react"
+export const dynamic = "force-dynamic"
+
+import { useEffect, useState } from "react"
 import Link from "next/link"
-import api from "../../services/api"
+import api from "../../lib/api"
 import { useAuth } from "../../context/AuthContext"
 
 export default function MyNewsPage(){
 
- const {user} = useAuth()
+ const auth = useAuth()
+
+ const user = auth?.user
 
  const [news,setNews] = useState([])
  const [loading,setLoading] = useState(true)
@@ -18,21 +22,19 @@ export default function MyNewsPage(){
 
    try{
 
-    const res = await api.get("/news")
+    const res = await api.get("/api/news/my")
 
-    const filtered = res.data.filter(
-     item => item.author?._id === user?._id
-    )
-
-    setNews(filtered)
+    setNews(res.data || [])
 
    }catch(err){
 
-    console.error(err)
+    console.error("Error fetching news:",err)
+
+   }finally{
+
+    setLoading(false)
 
    }
-
-   setLoading(false)
 
   }
 
@@ -42,26 +44,6 @@ export default function MyNewsPage(){
 
  },[user])
 
- const deleteNews = async (id)=>{
-
-  if(!confirm("Delete this news?")){
-   return
-  }
-
-  try{
-
-   await api.delete("/news/" + id)
-
-   setNews(news.filter(n => n._id !== id))
-
-  }catch(err){
-
-   console.error(err)
-
-  }
-
- }
-
  if(loading){
   return(
    <div className="text-center py-10">
@@ -70,68 +52,44 @@ export default function MyNewsPage(){
   )
  }
 
+ if(!user){
+  return(
+   <div className="text-center py-10">
+    Please login to view your news
+   </div>
+  )
+ }
+
  return(
 
-  <div className="max-w-5xl mx-auto bg-white shadow rounded p-6">
+  <div className="max-w-5xl mx-auto py-8 space-y-6">
 
-   <h1 className="text-2xl font-bold mb-6">
+   <h1 className="text-3xl font-bold">
     My News
    </h1>
 
-   <div className="space-y-4">
+   {news.length === 0 ? (
+    <p>No news found</p>
+   ) : (
+    news.map(item=>(
+     <div key={item._id} className="border p-4 rounded">
 
-    {news.map(item => (
+      <h2 className="text-xl font-semibold">
+       {item.title}
+      </h2>
 
-     <div
-      key={item._id}
-      className="flex justify-between items-center border p-4 rounded"
-     >
-
-      <div>
-
-       <h3 className="font-semibold">
-        {item.title}
-       </h3>
-
-       <p className="text-sm text-gray-500">
-        {new Date(item.createdAt).toLocaleDateString()}
-       </p>
-
-      </div>
-
-      <div className="flex gap-3">
-
-       <Link
-        href={`/news/${item.slug}`}
-        className="text-blue-600"
-       >
-        View
-       </Link>
-
-       <Link
-        href={`/news/edit/${item._id}`}
-        className="text-green-600"
-       >
-        Edit
-       </Link>
-
-       <button
-        onClick={()=>deleteNews(item._id)}
-        className="text-red-600"
-       >
-        Delete
-       </button>
-
-      </div>
+      <Link
+       href={`/news/${item.slug}`}
+       className="text-blue-600"
+      >
+       View
+      </Link>
 
      </div>
-
-    ))}
-
-   </div>
+    ))
+   )}
 
   </div>
 
  )
-
 }
