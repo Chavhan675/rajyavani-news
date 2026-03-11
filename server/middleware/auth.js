@@ -1,23 +1,38 @@
-const jwt = require("jsonwebtoken");
+import jwt from "jsonwebtoken"
+import User from "../models/User.js"
 
-module.exports = (req,res,next)=>{
+const protect = async (req,res,next) => {
 
-const token = req.headers.authorization;
+ let token
 
-if(!token) return res.status(401).json({error:"Unauthorized"});
+ if(req.headers.authorization && req.headers.authorization.startsWith("Bearer")){
 
-try{
+  try{
 
-const decoded = jwt.verify(token,process.env.JWT_SECRET);
+   token = req.headers.authorization.split(" ")[1]
 
-req.user = decoded;
+   const decoded = jwt.verify(token,process.env.JWT_SECRET)
 
-next();
+   req.user = await User.findById(decoded.id).select("-password")
 
-}catch(err){
+   if(!req.user){
+    return res.status(401).json({message:"User not found"})
+   }
 
-res.status(401).json({error:"Invalid token"});
+   next()
+
+  }catch(error){
+
+   return res.status(401).json({message:"Token not valid"})
+
+  }
+
+ }else{
+
+  return res.status(401).json({message:"No token provided"})
+
+ }
 
 }
 
-};
+export default protect

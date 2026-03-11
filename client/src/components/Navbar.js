@@ -1,73 +1,62 @@
-"use client";
+"use client"
 
-import Link from "next/link";
-import { useState } from "react";
+import { useState } from "react"
+import Link from "next/link"
 
-export default function Navbar() {
+export default function Navbar(){
 
-  const [menuOpen, setMenuOpen] = useState(false);
+ const [menuOpen,setMenuOpen] = useState(false)
 
-  return (
-    <header className="navbar">
+ return(
 
-      <div className="navbar-container">
+  <header className="bg-red-600 text-white shadow">
 
-        {/* Logo */}
+   {/* TOP BAR */}
 
-        <Link href="/" className="logo">
-          Rajyavani
-        </Link>
+   <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
 
+    <Link href="/" className="text-2xl font-bold">
+     राज्यवाणी
+    </Link>
 
-        {/* Desktop Menu */}
+    <button
+     className="md:hidden"
+     onClick={()=>setMenuOpen(!menuOpen)}
+    >
+     ☰
+    </button>
 
-        <nav className="nav-links">
+    <nav className="hidden md:flex gap-6 text-sm font-semibold">
 
-          <Link href="/category/maharashtra">महाराष्ट्र</Link>
-          <Link href="/category/india">भारत</Link>
-          <Link href="/category/politics">राजकारण</Link>
-          <Link href="/category/sports">क्रीडा</Link>
-          <Link href="/category/technology">टेक</Link>
+     <Link href="/">मुख्य</Link>
+     <Link href="/category/maharashtra">महाराष्ट्र</Link>
+     <Link href="/category/politics">राजकारण</Link>
+     <Link href="/category/sports">क्रीडा</Link>
+     <Link href="/category/technology">तंत्रज्ञान</Link>
+     <Link href="/category/entertainment">मनोरंजन</Link>
 
-        </nav>
+    </nav>
 
+   </div>
 
-        {/* Right side */}
+   {/* MOBILE MENU */}
 
-        <div className="nav-right">
+   {menuOpen && (
 
-          <Link href="/search">🔍</Link>
+    <div className="md:hidden bg-red-700 px-4 py-3 space-y-3">
 
-          <Link href="/login" className="login-btn">
-            Login
-          </Link>
+     <Link href="/" className="block">मुख्य</Link>
+     <Link href="/category/maharashtra" className="block">महाराष्ट्र</Link>
+     <Link href="/category/politics" className="block">राजकारण</Link>
+     <Link href="/category/sports" className="block">क्रीडा</Link>
+     <Link href="/category/technology" className="block">तंत्रज्ञान</Link>
+     <Link href="/category/entertainment" className="block">मनोरंजन</Link>
 
-          <button
-            className="mobile-menu"
-            onClick={() => setMenuOpen(!menuOpen)}
-          >
-            ☰
-          </button>
+    </div>
 
-        </div>
+   )}
 
-      </div>
+  </header>
 
-
-      {/* Mobile Menu */}
-
-      {menuOpen && (
-        <div className="mobile-nav">
-
-          <Link href="/category/maharashtra">महाराष्ट्र</Link>
-          <Link href="/category/india">भारत</Link>
-          <Link href="/category/politics">राजकारण</Link>
-          <Link href="/category/sports">क्रीडा</Link>
-          <Link href="/category/technology">टेक</Link>
-
-        </div>
-      )}
-
-    </header>
-  );
+ )
 }

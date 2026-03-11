@@ -1,96 +1,72 @@
-"use client";
+"use client"
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react"
+import api from "../services/api"
 
-const AuthContext = createContext();
+const AuthContext = createContext()
 
-export function AuthProvider({children}){
+export const AuthProvider = ({children})=>{
 
-const [user,setUser] = useState(null);
-const [token,setToken] = useState(null);
-const [loading,setLoading] = useState(true);
+ const [user,setUser] = useState(null)
+ const [loading,setLoading] = useState(true)
 
-useEffect(()=>{
+ useEffect(()=>{
 
-if(typeof window !== "undefined"){
+  const token = localStorage.getItem("token")
 
-const storedUser = localStorage.getItem("user");
-const storedToken = localStorage.getItem("token");
+  if(token){
 
-if(storedUser && storedToken){
+   api.get("/auth/profile")
+   .then(res=>{
+    setUser(res.data)
+    setLoading(false)
+   })
+   .catch(()=>{
+    localStorage.removeItem("token")
+    setLoading(false)
+   })
 
-setUser(JSON.parse(storedUser));
-setToken(storedToken);
+  }else{
+   setLoading(false)
+  }
 
-}
+ },[])
 
-setLoading(false);
+ const login = async (email,password)=>{
 
-}
+  const res = await api.post("/auth/login",{email,password})
 
-},[]);
+  localStorage.setItem("token",res.data.token)
 
-/* ================= LOGIN ================= */
+  setUser(res.data)
 
-const login = (userData,tokenData)=>{
+ }
 
-localStorage.setItem("user",JSON.stringify(userData));
-localStorage.setItem("token",tokenData);
+ const logout = ()=>{
 
-setUser(userData);
-setToken(tokenData);
+  localStorage.removeItem("token")
 
-};
+  setUser(null)
 
-/* ================= LOGOUT ================= */
+ }
 
-const logout = ()=>{
+ return(
 
-localStorage.removeItem("user");
-localStorage.removeItem("token");
+  <AuthContext.Provider
+   value={{
+    user,
+    login,
+    logout,
+    loading
+   }}
+  >
+   {children}
+  </AuthContext.Provider>
 
-setUser(null);
-setToken(null);
-
-};
-
-/* ================= UPDATE USER ================= */
-
-const updateUser = (data)=>{
-
-const updated = {...user,...data};
-
-localStorage.setItem("user",JSON.stringify(updated));
-
-setUser(updated);
-
-};
-
-return(
-
-<AuthContext.Provider
-value={{
-user,
-token,
-loading,
-login,
-logout,
-updateUser
-}}
->
-
-{children}
-
-</AuthContext.Provider>
-
-);
+ )
 
 }
 
-/* ================= USE AUTH HOOK ================= */
-
-export function useAuth(){
-
-return useContext(AuthContext);
-
+export const useAuth = ()=>{
+ return useContext(AuthContext)
 }

@@ -1,51 +1,65 @@
-const mongoose = require("mongoose");
-require("dotenv").config();
+import mongoose from "mongoose"
+import dotenv from "dotenv"
+import News from "../models/News.js"
+import Category from "../models/Category.js"
+import User from "../models/User.js"
 
-const News = require("../models/News");
+dotenv.config()
 
-mongoose.connect(process.env.MONGO_URI)
-.then(()=>console.log("DB connected"));
+const seedNews = async () => {
 
-const news = [
+ try{
 
-{
-title:"Pune Metro Update",
-slug:"pune-metro-update",
-category:"maharashtra",
-content:"Latest updates about Pune metro project.",
-author:"Rajyavani"
-},
+  await mongoose.connect(process.env.MONGO_URI)
 
-{
-title:"India Election News",
-slug:"india-election-news",
-category:"politics",
-content:"Latest political updates from India.",
-author:"Rajyavani"
+  const category = await Category.findOne()
+
+  const user = await User.findOne()
+
+  if(!category || !user){
+   console.log("Need category and user before seeding news")
+   process.exit()
+  }
+
+  const newsData = [
+   {
+    title:"महाराष्ट्रात मुसळधार पाऊस",
+    description:"Heavy rainfall across Maharashtra",
+    content:"Maharashtra experienced heavy rainfall today across several districts.",
+    category:category._id,
+    author:user._id,
+    status:"published",
+    location:"Pune",
+    tags:["rain","maharashtra"]
+   },
+   {
+    title:"भारताने सामना जिंकला",
+    description:"India wins thrilling cricket match",
+    content:"India defeated Australia in a thrilling cricket match.",
+    category:category._id,
+    author:user._id,
+    status:"published",
+    location:"Mumbai",
+    tags:["cricket","india"]
+   }
+  ]
+
+  await News.deleteMany()
+
+  await News.insertMany(newsData)
+
+  console.log("News seeded successfully")
+
+  process.exit()
+
+ }catch(error){
+
+  console.error(error)
+
+  process.exit(1)
+
+ }
+
 }
 
-];
-
-const seedNews = async()=>{
-
-try{
-
-await News.deleteMany();
-
-await News.insertMany(news);
-
-console.log("News seeded");
-
-process.exit();
-
-}catch(err){
-
-console.error(err);
-
-process.exit(1);
-
-}
-
-};
-
-seedNews();
+seedNews()

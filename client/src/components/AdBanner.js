@@ -1,22 +1,51 @@
-"use client";
+"use client"
 
-export default function AdBanner({ image, link }) {
+import {useEffect,useState} from "react"
+import api from "../lib/api"
 
-  return (
+export default function AdBanner({position}){
 
-    <div className="ad-banner">
+ const [ads,setAds] = useState([])
 
-      <a href={link} target="_blank">
+ useEffect(()=>{
 
-        <img
-          src={image}
-          alt="Advertisement"
-        />
+  const fetchAds = async()=>{
 
-      </a>
+   try{
 
-    </div>
+    const res = await api.get(`/ads/position/${position}`)
 
-  );
+    setAds(res.data)
+
+   }catch(err){
+
+    console.error("Ad fetch error",err)
+
+   }
+
+  }
+
+  fetchAds()
+
+ },[position])
+
+ return(
+
+  <div>
+
+   {ads.map(ad=>(
+    <a key={ad._id} href={ad.link} target="_blank">
+
+     <img
+      src={`http://localhost:5000/uploads/${ad.image}`}
+      style={{width:"100%",margin:"10px 0"}}
+     />
+
+    </a>
+   ))}
+
+  </div>
+
+ )
 
 }

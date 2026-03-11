@@ -1,68 +1,117 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { getTrendingNews } from "@/lib/api";
+import { useEffect,useState } from "react"
+import Link from "next/link"
 
-export default function HeroSlider(){
+export default function HeroSlider({news}){
 
-  const [news,setNews] = useState([]);
-  const [index,setIndex] = useState(0);
+ const [index,setIndex] = useState(0)
 
-  useEffect(()=>{
+ useEffect(()=>{
 
-    const loadNews = async()=>{
-      try{
-        const res = await getTrendingNews();
-        setNews(res.data.slice(0,5));
-      }catch(err){
-        console.error(err);
-      }
-    };
+  if(!news || news.length===0) return
 
-    loadNews();
+  const interval=setInterval(()=>{
+   setIndex(prev => (prev+1)%news.length)
+  },5000)
 
-  },[]);
+  return ()=>clearInterval(interval)
 
-  useEffect(()=>{
+ },[news])
 
-    const interval = setInterval(()=>{
-      setIndex((prev)=> (prev + 1) % news.length);
-    },5000);
+ if(!news || news.length===0){
+  return null
+ }
 
-    return ()=> clearInterval(interval);
+ const current=news[index]
 
-  },[news]);
+ const nextSlide=()=>{
+  setIndex((index+1)%news.length)
+ }
 
-  if(news.length === 0) return null;
+ const prevSlide=()=>{
+  setIndex((index-1+news.length)%news.length)
+ }
 
-  const item = news[index];
+ return(
 
-  return(
+  <section className="relative w-full h-[300px] md:h-[420px] lg:h-[500px] overflow-hidden rounded-xl shadow-lg">
 
-    <div className="hero-slider">
+   {/* IMAGE */}
 
-      <Link href={`/news/${item.slug}`}>
+   <img
+    src={`http://localhost:5000/uploads/${current.image}`}
+    alt={current.title}
+    className="w-full h-full object-cover transition duration-700 hover:scale-105"
+   />
 
-        <img
-          src={item.image}
-          alt={item.title}
-        />
 
-        <div className="slider-overlay">
-          <h2>{item.title}</h2>
-        </div>
+   {/* OVERLAY */}
 
-      </Link>
-import Image from "next/image";
+   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
 
-<Image
-  src={news.image}
-  alt={news.title}
-  width={600}
-  height={400}
-/>
-    </div>
 
-  );
+   {/* TEXT */}
+
+   <div className="absolute bottom-10 left-8 right-8 text-white">
+
+    <Link href={`/news/${current.slug}`}>
+
+     <h1 className="text-2xl md:text-4xl font-bold hover:text-red-400 transition">
+
+      {current.title}
+
+     </h1>
+
+    </Link>
+
+   </div>
+
+
+
+   {/* LEFT ARROW */}
+
+   <button
+    onClick={prevSlide}
+    className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-red-600 transition"
+   >
+
+    ‹
+
+   </button>
+
+
+
+   {/* RIGHT ARROW */}
+
+   <button
+    onClick={nextSlide}
+    className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-red-600 transition"
+   >
+
+    ›
+
+   </button>
+
+
+
+   {/* INDICATORS */}
+
+   <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+
+    {news.map((_,i)=>(
+     <div
+      key={i}
+      className={`w-3 h-3 rounded-full ${
+       i===index ? "bg-red-500" : "bg-white/60"
+      }`}
+     ></div>
+    ))}
+
+   </div>
+
+  </section>
+
+ )
+
 }

@@ -1,63 +1,59 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { searchNews } from "@/lib/api";
-import NewsCard from "@/components/NewsCard";
+import { useSearchParams } from "next/navigation"
+import { useEffect,useState } from "react"
+import api from "../../services/api"
+import NewsCard from "../../components/NewsCard"
 
-export default function SearchPage() {
+export default function SearchPage(){
 
-  const [query, setQuery] = useState("");
-  const [results, setResults] = useState([]);
+ const params = useSearchParams()
+ const query = params.get("q")
 
-  const handleSearch = async (e) => {
+ const [results,setResults]=useState([])
 
-    e.preventDefault();
+ useEffect(()=>{
 
-    if(!query) return;
+  const fetchResults=async()=>{
 
-    try{
+   try{
 
-      const res = await searchNews(query);
-      setResults(res.data);
+    const res = await api.get(`/search?q=${query}`)
 
-    }catch(err){
-      console.error(err);
-    }
+    setResults(res.data)
 
-  };
+   }catch(err){
+    console.error(err)
+   }
 
-  return (
+  }
 
-    <div className="search-page">
+  if(query){
+   fetchResults()
+  }
 
-      <h1>Search News</h1>
+ },[query])
 
-      <form onSubmit={handleSearch} className="search-form">
+ return(
 
-        <input
-          type="text"
-          placeholder="Search news..."
-          value={query}
-          onChange={(e)=>setQuery(e.target.value)}
-        />
+  <div className="max-w-7xl mx-auto px-4 py-8">
 
-        <button type="submit">
-          Search
-        </button>
+   <h1 className="text-2xl font-bold mb-6">
 
-      </form>
+    Search results for: {query}
 
+   </h1>
 
-      <div className="news-grid">
+   <div className="grid md:grid-cols-3 gap-6">
 
-        {results.map((news)=>(
-          <NewsCard key={news._id} news={news}/>
-        ))}
+    {results.map(item=>(
+     <NewsCard key={item._id} news={item}/>
+    ))}
 
-      </div>
+   </div>
 
-    </div>
+  </div>
 
-  );
+ )
 
 }

@@ -1,18 +1,36 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose"
 
 const newsSchema = new mongoose.Schema({
-title:String,
-slug:{type:String,unique:true},
-category:String,
-image:String,
-content:String,
-author:String
-},{
-timestamps:true
-});
 
-newsSchema.index({slug:1});
-newsSchema.index({category:1});
-newsSchema.index({createdAt:-1});
+ title:{
+  type:String,
+  required:true
+ },
 
-module.exports = mongoose.model("News",newsSchema);
+ content:{
+  type:String,
+  required:true
+ },
+
+ category:{
+  type:String,
+  required:true
+ },
+
+ image:{
+  type:String
+ },
+
+ slug:{
+  type:String,
+  unique:true
+ },
+
+ views:{
+  type:Number,
+  default:0
+ }
+
+},{ timestamps:true })
+
+export default mongoose.model("News",newsSchema)

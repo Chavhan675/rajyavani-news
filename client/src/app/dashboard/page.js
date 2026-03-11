@@ -1,96 +1,86 @@
 "use client"
 
-import React,{useEffect,useState} from "react"
-import axios from "axios"
-import NewsCard from "../../components/NewsCard"
+import { useEffect } from "react"
+import { useRouter } from "next/navigation"
+import Link from "next/link"
+import { useAuth } from "../../context/AuthContext"
 
-const API="http://localhost:5000/api"
+export default function DashboardPage(){
 
-export default function Dashboard(){
+ const {user,loading,logout} = useAuth()
+ const router = useRouter()
 
-const [news,setNews]=useState([])
-const [loading,setLoading]=useState(true)
+ useEffect(()=>{
 
-useEffect(()=>{
+  if(!loading && !user){
+   router.push("/login")
+  }
 
-async function load(){
+ },[user,loading,router])
 
-const token=localStorage.getItem("token")
+ if(loading){
+  return(
+   <div className="text-center py-10">
+    Loading...
+   </div>
+  )
+ }
 
-if(!token){
-setLoading(false)
-return
-}
+ if(!user){
+  return null
+ }
 
-try{
+ return(
 
-const res=await axios.get(`${API}/news/my-news`,{
-headers:{
-Authorization:`Bearer ${token}`
-}
-})
+  <div className="max-w-4xl mx-auto bg-white shadow rounded p-6 space-y-6">
 
-setNews(res.data)
+   <h1 className="text-3xl font-bold">
+    Dashboard
+   </h1>
 
-}catch(e){
+   <div className="space-y-2">
 
-setNews([])
+    <p>
+     <strong>Name:</strong> {user.name}
+    </p>
 
-}
+    <p>
+     <strong>Email:</strong> {user.email}
+    </p>
 
-setLoading(false)
+    <p>
+     <strong>Role:</strong> {user.role}
+    </p>
 
-}
+   </div>
 
-load()
+   <div className="flex flex-wrap gap-4 pt-4">
 
-},[])
+    <Link
+     href="/news/create"
+     className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+    >
+     Create News
+    </Link>
 
-if(loading){
+    <Link
+     href="/my-news"
+     className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+    >
+     My News
+    </Link>
 
-return(
+    <button
+     onClick={logout}
+     className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+    >
+     Logout
+    </button>
 
-<div style={{padding:"60px",textAlign:"center"}}>
-Loading Dashboard...
-</div>
+   </div>
 
-)
+  </div>
 
-}
-
-return(
-
-<div style={{maxWidth:"1200px",margin:"auto",padding:"20px"}}>
-
-<h1 style={{marginBottom:"20px"}}>My News</h1>
-
-{news.length===0 && (
-
-<p>No news submitted</p>
-
-)}
-
-<div
-style={{
-display:"grid",
-gridTemplateColumns:"repeat(3,1fr)",
-gap:"15px"
-}}
->
-
-{news.map(item=>(
-
-<NewsCard
-key={item._id}
-news={item}
-/>
-
-))}
-
-</div>
-
-</div>
-
-)
+ )
 
 }

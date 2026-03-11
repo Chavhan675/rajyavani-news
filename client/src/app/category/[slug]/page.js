@@ -1,103 +1,83 @@
 "use client"
 
-import React,{useEffect,useState} from "react"
-import axios from "axios"
-import {useParams} from "next/navigation"
-
+import { useEffect, useState } from "react"
+import { useParams } from "next/navigation"
+import api from "../../../lib/api"
 import NewsCard from "../../../components/NewsCard"
-
-const API="http://localhost:5000/api"
 
 export default function CategoryPage(){
 
-const params=useParams()
-const slug=params.slug
+ const { slug } = useParams()
 
-const [news,setNews]=useState([])
-const [category,setCategory]=useState("")
-const [loading,setLoading]=useState(true)
+ const [news,setNews] = useState([])
 
-useEffect(()=>{
+ const [loading,setLoading] = useState(true)
 
-async function load(){
+ useEffect(()=>{
 
-try{
+  const fetchCategoryNews = async()=>{
 
-const res=await axios.get(`${API}/news/category/${slug}`)
+   try{
 
-setNews(res.data.news || [])
-setCategory(res.data.category?.name || slug)
+    const res = await api.get(`/news/category/${slug}`)
 
-}catch(e){
+    setNews(res.data)
 
-setNews([])
+   }catch(err){
 
-}
+    console.error(err)
 
-setLoading(false)
+   }
 
-}
+   setLoading(false)
 
-if(slug) load()
+  }
 
-},[slug])
+  fetchCategoryNews()
 
-if(loading){
+ },[slug])
 
-return(
+ if(loading){
 
-<div style={{padding:"60px",textAlign:"center"}}>
-Loading...
-</div>
+  return(
 
-)
+   <div className="text-center py-20">
 
-}
+    Loading news...
 
-return(
+   </div>
 
-<div
-style={{
-maxWidth:"1200px",
-margin:"auto",
-padding:"20px"
-}}
->
+  )
 
-<h1
-style={{
-fontSize:"28px",
-marginBottom:"20px",
-borderLeft:"6px solid #e4002b",
-paddingLeft:"10px"
-}}
->
+ }
 
-{category}
+ return(
 
-</h1>
+  <div className="max-w-7xl mx-auto px-4 py-10">
 
-<div
-style={{
-display:"grid",
-gridTemplateColumns:"repeat(3,1fr)",
-gap:"20px"
-}}
->
+   <h1 className="text-3xl font-bold mb-8 capitalize">
 
-{news.map(item=>(
+    {slug} News
 
-<NewsCard
-key={item._id}
-news={item}
-/>
+   </h1>
 
-))}
+   {news.length === 0 ? (
 
-</div>
+    <p>No news available</p>
 
-</div>
+   ) : (
 
-)
+    <div className="grid md:grid-cols-3 gap-6">
 
+     {news.map(item=>(
+      <NewsCard key={item._id} news={item}/>
+     ))}
+
+    </div>
+
+   )}
+
+  </div>
+
+ )
 }

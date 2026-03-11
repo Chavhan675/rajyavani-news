@@ -1,13 +1,24 @@
-const express = require("express");
-const router = express.Router();
-const Earnings = require("../models/Earnings");
+import express from "express"
+import {
+ createEarning,
+ getUserEarnings,
+ getAllEarnings,
+ updateEarningStatus,
+ deleteEarning
+} from "../controllers/earningsController.js"
+import protect from "../middleware/auth.js"
+import adminMiddleware from "../middleware/adminMiddleware.js"
 
-router.get("/", async(req,res)=>{
+const router = express.Router()
 
-const earnings = await Earnings.find();
+router.post("/", protect, adminMiddleware, createEarning)
 
-res.json(earnings);
+router.get("/my", protect, getUserEarnings)
 
-});
+router.get("/", protect, adminMiddleware, getAllEarnings)
 
-module.exports = router;
+router.put("/:id", protect, adminMiddleware, updateEarningStatus)
+
+router.delete("/:id", protect, adminMiddleware, deleteEarning)
+
+export default router

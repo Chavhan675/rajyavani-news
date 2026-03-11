@@ -1,42 +1,102 @@
-import { getNewsBySlug } from "@/lib/api";
+"use client"
 
-export async function generateMetadata({ params }) {
+import { useEffect,useState } from "react"
+import { useParams } from "next/navigation"
+import api from "../../../services/api"
+import AdBanner from "../../../components/AdBanner"
 
-  const article = await getNewsBySlug(params.slug);
+export default function NewsPage(){
 
-  return {
-    title: article?.title || "Rajyavani",
-    description: article?.content?.slice(0,150) || "Latest Marathi News"
-  };
+ const { slug } = useParams()
 
-}
+ const [news,setNews] = useState(null)
 
-export default async function NewsPage({ params }) {
+ useEffect(()=>{
 
-  const article = await getNewsBySlug(params.slug);
+  const fetchNews = async()=>{
 
-  if (!article) {
-    return <div>News not found</div>;
+   try{
+
+    const res = await api.get(`/news/${slug}`)
+
+    setNews(res.data)
+
+   }catch(err){
+
+    console.error(err)
+
+   }
+
   }
 
-  return (
+  if(slug) fetchNews()
 
-    <div style={{maxWidth:"900px",margin:"40px auto"}}>
+ },[slug])
 
-      <h1>{article.title}</h1>
 
-      {article.image && (
-        <img
-          src={article.image}
-          alt={article.title}
-          style={{width:"100%",margin:"20px 0"}}
-        />
-      )}
+ if(!news){
 
-      <p>{article.content}</p>
+  return(
+   <div className="max-w-4xl mx-auto py-20 text-center">
+    Loading...
+   </div>
+  )
 
-    </div>
+ }
 
-  );
+
+ return(
+
+  <div className="max-w-5xl mx-auto px-4 py-10 space-y-8">
+
+
+   {/* NEWS TITLE */}
+
+   <h1 className="text-4xl font-bold leading-snug">
+    {news.title}
+   </h1>
+
+
+   {/* CATEGORY */}
+
+   <div className="text-red-600 font-semibold">
+    {news.category?.name}
+   </div>
+
+
+   {/* IMAGE */}
+
+   {news.image &&(
+
+    <img
+     src={`http://localhost:5000/uploads/${news.image}`}
+     className="w-full rounded-lg"
+    />
+
+   )}
+
+
+   {/* AD */}
+
+   <AdBanner position="between" />
+
+
+   {/* CONTENT */}
+
+   <div className="text-lg leading-relaxed space-y-6">
+
+    {news.content}
+
+   </div>
+
+
+   {/* FOOTER AD */}
+
+   <AdBanner position="footer" />
+
+
+  </div>
+
+ )
 
 }

@@ -1,49 +1,63 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { getLatestNews } from "@/lib/api";
+import { useEffect,useState } from "react"
+import io from "socket.io-client"
+import api from "../lib/api"
+
+const socket = io("http://localhost:5000")
 
 export default function BreakingNews(){
 
-  const [news,setNews] = useState([]);
+ const [news,setNews] = useState([])
 
-  useEffect(()=>{
+ useEffect(()=>{
 
-    const loadNews = async()=>{
-      try{
-        const res = await getLatestNews();
-        setNews(res.data.slice(0,6));
-      }catch(err){
-        console.error(err);
-      }
-    };
+  const fetchBreaking = async()=>{
 
-    loadNews();
+   try{
 
-  },[]);
+    const res = await api.get("/news")
 
-  if(news.length === 0) return null;
+    setNews(res.data.slice(0,5))
 
-  return(
+   }catch(err){
 
-    <div className="breaking-news">
+    console.error(err)
 
-      <span className="breaking-label">
-        BREAKING
-      </span>
+   }
 
-      <div className="breaking-scroll">
+  }
 
-        {news.map((item)=>(
-          <Link key={item._id} href={`/news/${item.slug}`}>
-            {item.title}
-          </Link>
-        ))}
+  fetchBreaking()
 
-      </div>
+  socket.on("breaking-news",(newNews)=>{
 
-    </div>
+   setNews(prev=>[newNews,...prev].slice(0,5))
 
-  );
+  })
+
+ },[])
+
+ return(
+
+  <div className="bg-red-600 text-white py-2 overflow-hidden">
+
+   <div className="flex">
+
+    <span className="font-bold px-4">
+     BREAKING
+    </span>
+
+    <marquee>
+
+     {news.map(n=>n.title).join(" 🔴 ")}
+
+    </marquee>
+
+   </div>
+
+  </div>
+
+ )
+
 }

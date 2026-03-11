@@ -1,98 +1,125 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
-import { addComment, getComments } from "@/lib/api";
+import { useEffect,useState } from "react"
+import api from "../services/api"
 
-export default function Comments({ newsId }) {
+export default function Comments({newsId}){
 
-  const [comments, setComments] = useState([]);
-  const [text, setText] = useState("");
+ const [comments,setComments] = useState([])
+ const [name,setName] = useState("")
+ const [message,setMessage] = useState("")
 
-  useEffect(() => {
+ useEffect(()=>{
 
-    const loadComments = async () => {
+  const fetchComments = async ()=>{
 
-      try{
-        const res = await getComments(newsId);
-        setComments(res.data);
-      }catch(err){
-        console.error(err);
-      }
+   try{
 
-    };
+    const res = await api.get(`/comments/${newsId}`)
 
-    loadComments();
+    setComments(res.data)
 
-  }, [newsId]);
+   }catch(err){
+    console.error(err)
+   }
 
+  }
 
+  fetchComments()
 
-  const handleSubmit = async (e) => {
-
-    e.preventDefault();
-
-    if(!text) return;
-
-    try{
-
-      const res = await addComment({
-        newsId,
-        text
-      });
-
-      setComments([res.data, ...comments]);
-      setText("");
-
-    }catch(err){
-      console.error(err);
-    }
-
-  };
+ },[newsId])
 
 
+ const submitComment = async e =>{
 
-  return (
+  e.preventDefault()
 
-    <div className="comments">
+  try{
 
-      <h2>Comments</h2>
+   const res = await api.post("/comments",{
+    name,
+    message,
+    news:newsId
+   })
 
-      <form onSubmit={handleSubmit} className="comment-form">
+   setComments([res.data,...comments])
 
-        <textarea
-          placeholder="Write your comment..."
-          value={text}
-          onChange={(e)=>setText(e.target.value)}
-        />
+   setName("")
+   setMessage("")
 
-        <button type="submit">
-          Post Comment
-        </button>
+  }catch(err){
+   console.error(err)
+  }
 
-      </form>
+ }
+
+ return(
+
+  <div className="mt-10">
+
+   <h3 className="text-xl font-bold mb-4">
+    Comments
+   </h3>
 
 
+   {/* COMMENT FORM */}
 
-      <div className="comment-list">
+   <form
+    onSubmit={submitComment}
+    className="space-y-3 mb-6"
+   >
 
-        {comments.map((c)=>(
-          <div key={c._id} className="comment">
+    <input
+     type="text"
+     placeholder="Your name"
+     value={name}
+     onChange={e=>setName(e.target.value)}
+     className="border p-2 w-full"
+     required
+    />
 
-            <p className="comment-text">
-              {c.text}
-            </p>
+    <textarea
+     placeholder="Write a comment..."
+     value={message}
+     onChange={e=>setMessage(e.target.value)}
+     className="border p-2 w-full"
+     required
+    />
 
-            <span className="comment-date">
-              {new Date(c.createdAt).toLocaleDateString()}
-            </span>
+    <button
+     className="bg-red-600 text-white px-4 py-2 rounded"
+    >
+     Post Comment
+    </button>
 
-          </div>
-        ))}
+   </form>
 
-      </div>
 
-    </div>
+   {/* COMMENTS LIST */}
 
-  );
+   <div className="space-y-4">
+
+    {comments.map(c=>(
+     <div
+      key={c._id}
+      className="bg-white p-3 rounded shadow"
+     >
+
+      <p className="font-semibold">
+       {c.name}
+      </p>
+
+      <p className="text-sm text-gray-600">
+       {c.message}
+      </p>
+
+     </div>
+    ))}
+
+   </div>
+
+  </div>
+
+ )
 
 }

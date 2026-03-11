@@ -1,71 +1,34 @@
-"use client";
+import Link from "next/link"
 
-import Link from "next/link";
+export default function NewsCard({news}){
 
-export default function NewsCard({ news }) {
+ return(
 
-  if (!news) return null;
+  <Link href={`/news/${news.slug}`}>
 
-  return (
-    <article className="news-card">
+   <div className="bg-white rounded-lg shadow hover:shadow-lg transition overflow-hidden cursor-pointer">
 
-      <Link href={`/news/${news.slug}`}>
+    {news.image &&(
 
-        <div className="news-image">
-          <img
-            src={news.image || "/default-news.jpg"}
-            alt={news.title}
-          />
-        </div>
+     <img
+      src={`http://localhost:5000/uploads/${news.image}`}
+      className="w-full h-48 object-cover"
+     />
 
-        <div className="news-content">
+    )}
 
-          {/* category */}
-          {news.category && (
-            <span className="news-category">
-              {news.category}
-            </span>
-          )}
+    <div className="p-4">
 
-          {/* title */}
-          <h3 className="news-title">
-            {news.title}
-          </h3>
+     <h3 className="font-bold text-lg">
+      {news.title}
+     </h3>
 
-          {/* description */}
-          {news.excerpt && (
-            <p className="news-excerpt">
-              {news.excerpt}
-            </p>
-          )}
-          import Image from "next/image";
+    </div>
 
-<Image
-  src={news.image}
-  alt={news.title}
-  width={600}
-  height={400}
-/>
+   </div>
 
-          {/* meta */}
-          <div className="news-meta">
+  </Link>
 
-            {news.author && (
-              <span>{news.author}</span>
-            )}
+ )
 
-            {news.createdAt && (
-              <span>
-                {new Date(news.createdAt).toLocaleDateString()}
-              </span>
-            )}
-
-          </div>
-
-        </div>
-
-      </Link>
-
-    </article>
-  );
 }

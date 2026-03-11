@@ -1,54 +1,47 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { getNewsByCategory } from "@/lib/api";
-import NewsCard from "./NewsCard";
+import Link from "next/link"
+import NewsCard from "./NewsCard"
 
-export default function CategorySection({ category, title }) {
+export default function CategorySection({title,news}){
 
-  const [news, setNews] = useState([]);
+ if(!news || news.length===0){
+  return null
+ }
 
-  useEffect(() => {
+ return(
 
-    const loadNews = async () => {
-      try {
-        const res = await getNewsByCategory(category);
-        setNews(res.data.slice(0,4));
-      } catch (err) {
-        console.error(err);
-      }
-    };
+  <section className="mt-12">
 
-    loadNews();
+   {/* SECTION HEADER */}
 
-  }, [category]);
+   <div className="flex justify-between items-center mb-6">
 
-  if(news.length === 0) return null;
+    <h2 className="text-2xl font-bold border-l-4 border-red-600 pl-3">
+     {title}
+    </h2>
 
-  return (
+    <Link
+     href={`/category/${title}`}
+     className="text-red-600 font-medium hover:underline"
+    >
+     सर्व बातम्या →
+    </Link>
 
-    <section className="category-section">
+   </div>
 
-      <div className="category-header">
+   {/* NEWS GRID */}
 
-        <h2>{title}</h2>
+   <div className="grid md:grid-cols-4 gap-6">
 
-        <Link href={`/category/${category}`}>
-          View All
-        </Link>
+    {news.slice(0,4).map(item=>(
+     <NewsCard key={item._id} news={item}/>
+    ))}
 
-      </div>
+   </div>
 
-      <div className="news-grid">
+  </section>
 
-        {news.map((item) => (
-          <NewsCard key={item._id} news={item} />
-        ))}
+ )
 
-      </div>
-
-    </section>
-
-  );
 }

@@ -1,93 +1,82 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { getLatestNews } from "@/lib/api";
+import Link from "next/link"
 
-export default function HeroSection() {
+export default function HeroSection({news}){
 
-  const [news, setNews] = useState([]);
+ if(!news || news.length===0){
+  return null
+ }
 
-  useEffect(() => {
+ const main=news[0]
+ const side=news.slice(1,5)
 
-    const loadNews = async () => {
-      try {
-        const res = await getLatestNews();
-        setNews(res.data.slice(0,5));
-      } catch (err) {
-        console.error(err);
-      }
-    };
+ return(
 
-    loadNews();
+  <section className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
 
-  }, []);
+   {/* BIG STORY */}
 
-  if(news.length === 0) return null;
+   <Link href={`/news/${main.slug}`} className="lg:col-span-2">
 
-  const mainNews = news[0];
-  const sideNews = news.slice(1);
+    <div className="relative h-[350px] md:h-[420px] rounded-xl overflow-hidden shadow-lg">
 
-  return (
-    <section className="hero-section">
+     <img
+      src={`http://localhost:5000/uploads/${main.image}`}
+      alt={main.title}
+      className="w-full h-full object-cover"
+     />
 
-      {/* main news */}
-      import Image from "next/image";
+     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"/>
 
-<Image
-  src={news.image}
-  alt={news.title}
-  width={600}
-  height={400}
-/>
+     <div className="absolute bottom-6 left-6 right-6 text-white">
 
-      <div className="hero-main">
+      <h1 className="text-2xl md:text-4xl font-bold hover:text-red-400 transition">
 
-        <Link href={`/news/${mainNews.slug}`}>
+       {main.title}
 
-          <img
-            src={mainNews.image}
-            alt={mainNews.title}
-          />
+      </h1>
 
-          <div className="hero-overlay">
+     </div>
 
-            <h1>
-              {mainNews.title}
-            </h1>
+    </div>
 
-          </div>
-
-        </Link>
-
-      </div>
+   </Link>
 
 
-      {/* side news */}
 
-      <div className="hero-side">
+   {/* SMALL STORIES */}
 
-        {sideNews.map((item) => (
+   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-6">
 
-          <Link key={item._id} href={`/news/${item.slug}`}>
+    {side.map(item=>(
 
-            <div className="hero-small">
+     <Link key={item._id} href={`/news/${item.slug}`}>
 
-              <img
-                src={item.image}
-                alt={item.title}
-              />
+      <div className="flex gap-4 bg-white rounded-xl shadow hover:shadow-lg transition p-3">
 
-              <p>{item.title}</p>
+       <img
+        src={`http://localhost:5000/uploads/${item.image}`}
+        alt={item.title}
+        className="w-28 h-20 object-cover rounded"
+       />
 
-            </div>
+       <p className="font-semibold hover:text-red-600">
 
-          </Link>
+        {item.title}
 
-        ))}
+       </p>
 
       </div>
 
-    </section>
-  );
+     </Link>
+
+    ))}
+
+   </div>
+
+  </section>
+
+ )
+
 }

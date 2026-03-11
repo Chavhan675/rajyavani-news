@@ -1,91 +1,22 @@
-"use client";
+export default function AdminPage(){
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { getAdminNews, deleteNews } from "@/lib/api";
+ return(
 
-export default function AdminDashboard() {
+  <div className="max-w-6xl mx-auto py-20">
 
-  const [news, setNews] = useState([]);
+   <h1 className="text-3xl font-bold mb-6">
 
-  useEffect(() => {
+    Admin Dashboard
 
-    const loadNews = async () => {
-      try{
-        const res = await getAdminNews();
-        setNews(res.data);
-      }catch(err){
-        console.error(err);
-      }
-    };
+   </h1>
 
-    loadNews();
+   <p className="text-gray-600">
 
-  }, []);
+    Manage news, categories, users and comments here.
 
+   </p>
 
+  </div>
 
-  const handleDelete = async (id) => {
-
-    if(!confirm("Delete this news?")) return;
-
-    try{
-
-      await deleteNews(id);
-
-      setNews(news.filter(n => n._id !== id));
-
-    }catch(err){
-      console.error(err);
-    }
-
-  };
-
-
-
-  return (
-
-    <div className="admin-dashboard">
-
-      <h1>Admin Dashboard</h1>
-
-      <Link href="/admin/create-news" className="create-btn">
-        + Create News
-      </Link>
-
-
-      <div className="admin-news-list">
-
-        {news.map((item)=>(
-
-          <div key={item._id} className="admin-news-card">
-
-            <h3>{item.title}</h3>
-
-            <p>{item.category}</p>
-
-            <div className="admin-actions">
-
-              <Link href={`/news/${item.slug}`}>
-                View
-              </Link>
-
-              <button
-                onClick={()=>handleDelete(item._id)}
-              >
-                Delete
-              </button>
-
-            </div>
-
-          </div>
-
-        ))}
-
-      </div>
-
-    </div>
-
-  );
-
+ )
 }

@@ -1,74 +1,94 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { registerUser } from "@/lib/api";
-import { useRouter } from "next/navigation";
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import api from "../../lib/api"
 
 export default function RegisterPage(){
 
-  const router = useRouter();
+ const router = useRouter()
 
-  const [name,setName] = useState("");
-  const [email,setEmail] = useState("");
-  const [password,setPassword] = useState("");
+ const [name,setName] = useState("")
+ const [email,setEmail] = useState("")
+ const [password,setPassword] = useState("")
 
-  const handleSubmit = async(e)=>{
-    e.preventDefault();
+ const handleSubmit = async(e)=>{
 
-    try{
+  e.preventDefault()
 
-      await registerUser({
-        name,
-        email,
-        password
-      });
+  try{
 
-      alert("Account created");
+   await api.post("/auth/register",{
+    name,
+    email,
+    password
+   })
 
-      router.push("/login");
+   alert("Registration successful")
 
-    }catch(err){
-      console.error(err);
-      alert("Registration failed");
-    }
-  };
+   router.push("/login")
 
-  return(
+  }catch(err){
 
-    <div className="auth-page">
+   alert(
+    err.response?.data?.message || "Registration failed"
+   )
 
-      <h1>Register</h1>
+  }
 
-      <form onSubmit={handleSubmit} className="auth-form">
+ }
 
-        <input
-          type="text"
-          placeholder="Name"
-          value={name}
-          onChange={(e)=>setName(e.target.value)}
-        />
+ return(
 
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e)=>setEmail(e.target.value)}
-        />
+  <div className="flex justify-center items-center min-h-screen">
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e)=>setPassword(e.target.value)}
-        />
+   <div className="bg-white shadow-lg p-8 w-[400px]">
 
-        <button type="submit">
-          Register
-        </button>
+    <h1 className="text-2xl font-bold mb-6 text-center">
+     Register
+    </h1>
 
-      </form>
+    <form onSubmit={handleSubmit} className="space-y-4">
 
-    </div>
+     <input
+      type="text"
+      placeholder="Name"
+      value={name}
+      onChange={(e)=>setName(e.target.value)}
+      className="border p-2 w-full"
+      required
+     />
 
-  );
+     <input
+      type="email"
+      placeholder="Email"
+      value={email}
+      onChange={(e)=>setEmail(e.target.value)}
+      className="border p-2 w-full"
+      required
+     />
+
+     <input
+      type="password"
+      placeholder="Password"
+      value={password}
+      onChange={(e)=>setPassword(e.target.value)}
+      className="border p-2 w-full"
+      required
+     />
+
+     <button
+      type="submit"
+      className="bg-red-600 text-white w-full py-2 hover:bg-red-700"
+     >
+      Register
+     </button>
+
+    </form>
+
+   </div>
+
+  </div>
+
+ )
 }
