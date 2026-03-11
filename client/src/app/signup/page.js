@@ -1,6 +1,6 @@
-export const dynamic = "force-dynamic"
-
 "use client"
+
+export const dynamic = "force-dynamic"
 
 import { useState } from "react"
 
@@ -9,20 +9,11 @@ export default function Signup() {
   const [name,setName] = useState("")
   const [email,setEmail] = useState("")
   const [password,setPassword] = useState("")
-  const [loading,setLoading] = useState(false)
 
-  const handleSubmit = async (e) => {
-
+  const handleSubmit = async (e)=>{
     e.preventDefault()
 
-    if(!name || !email || !password){
-      alert("Please fill all fields")
-      return
-    }
-
     try{
-
-      setLoading(true)
 
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/auth/signup`,
@@ -37,23 +28,11 @@ export default function Signup() {
 
       const data = await res.json()
 
-      alert(data.message || "Signup successful")
-
-      setName("")
-      setEmail("")
-      setPassword("")
+      alert(data.message)
 
     }catch(err){
-
-      console.error("Signup error:",err)
-      alert("Signup failed")
-
-    }finally{
-
-      setLoading(false)
-
+      console.log(err)
     }
-
   }
 
   return(
@@ -85,14 +64,11 @@ export default function Signup() {
           onChange={(e)=>setPassword(e.target.value)}
         />
 
-        <button type="submit" disabled={loading}>
-          {loading ? "Creating..." : "Signup"}
-        </button>
+        <button type="submit">Signup</button>
 
       </form>
 
     </div>
 
   )
-
 }
