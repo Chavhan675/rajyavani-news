@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { getProfile } from "@/lib/api"
+import { getProfile } from "../../lib/api"
 
 export const dynamic = "force-dynamic"
 
@@ -16,7 +16,7 @@ export default function ProfilePage(){
         const res = await getProfile()
         setUser(res.data)
       }catch(err){
-        console.error(err)
+        console.error("Profile error:",err)
       }
     }
 
@@ -24,11 +24,17 @@ export default function ProfilePage(){
 
   },[])
 
-  if(!user) return <p>Loading...</p>
+  if(!user){
+    return(
+      <div style={{padding:"40px"}}>
+        <h2>Loading profile...</h2>
+      </div>
+    )
+  }
 
   return(
 
-    <div className="profile-page">
+    <div style={{padding:"40px"}}>
 
       <h1>My Profile</h1>
 
