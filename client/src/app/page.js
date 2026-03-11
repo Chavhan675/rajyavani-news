@@ -12,27 +12,35 @@ export default function HomePage() {
 
   const [news, setNews] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
 
     const fetchNews = async () => {
+
       try {
 
         const res = await api.get("/api/news")
-        setNews(res.data || [])
+
+        setNews(res?.data || [])
 
       } catch (err) {
 
         console.error("News fetch error:", err)
+        setError("Failed to load news")
 
       } finally {
+
         setLoading(false)
+
       }
+
     }
 
     fetchNews()
 
   }, [])
+
 
   if (loading) {
     return (
@@ -42,13 +50,22 @@ export default function HomePage() {
     )
   }
 
+  if (error) {
+    return (
+      <div className="text-center py-20 text-red-600 font-semibold">
+        {error}
+      </div>
+    )
+  }
+
   return (
 
     <div className="max-w-7xl mx-auto px-4 py-6 space-y-16">
 
+
       {/* HERO SECTION */}
 
-      <HeroSection news={(news || []).slice(0, 5)} />
+      <HeroSection news={(news || []).slice(0,5)} />
 
 
       {/* TOP AD */}
@@ -70,7 +87,7 @@ export default function HomePage() {
 
         <div className="grid md:grid-cols-3 gap-6">
 
-          {(news || []).slice(5, 11).map(item => (
+          {(news || []).slice(5,11).map(item => (
 
             <NewsCard
               key={item._id}
@@ -106,7 +123,7 @@ export default function HomePage() {
 
               {(news || [])
                 .filter(n => n?.category?.name === "Maharashtra")
-                .slice(0, 6)
+                .slice(0,6)
                 .map(item => (
 
                   <NewsCard
@@ -138,7 +155,7 @@ export default function HomePage() {
 
               {(news || [])
                 .filter(n => n?.category?.name === "Politics")
-                .slice(0, 6)
+                .slice(0,6)
                 .map(item => (
 
                   <NewsCard
@@ -165,7 +182,7 @@ export default function HomePage() {
 
               {(news || [])
                 .filter(n => n?.category?.name === "Sports")
-                .slice(0, 6)
+                .slice(0,6)
                 .map(item => (
 
                   <NewsCard
@@ -188,8 +205,6 @@ export default function HomePage() {
 
           <Sidebar />
 
-          {/* SIDEBAR AD */}
-
           <AdBanner position="sidebar" />
 
         </div>
@@ -201,7 +216,9 @@ export default function HomePage() {
 
       <AdBanner position="footer" />
 
+
     </div>
 
   )
+
 }
