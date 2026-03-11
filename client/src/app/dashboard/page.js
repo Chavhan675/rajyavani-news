@@ -1,5 +1,7 @@
 "use client"
 
+export const dynamic = "force-dynamic"
+
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
@@ -7,7 +9,12 @@ import { useAuth } from "../../context/AuthContext"
 
 export default function DashboardPage(){
 
- const {user,loading,logout} = useAuth()
+ const auth = useAuth()
+
+ const user = auth?.user
+ const loading = auth?.loading
+ const logout = auth?.logout
+
  const router = useRouter()
 
  useEffect(()=>{
@@ -82,5 +89,4 @@ export default function DashboardPage(){
   </div>
 
  )
-
 }
