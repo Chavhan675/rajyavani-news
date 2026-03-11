@@ -5,79 +5,57 @@ import { useParams } from "next/navigation"
 import api from "../../../lib/api"
 import NewsCard from "../../../components/NewsCard"
 
-export default function CategoryPage(){
+export default function CategoryPage() {
 
- const { slug } = useParams()
+  const { slug } = useParams()
 
- const [news,setNews] = useState([])
+  const [news, setNews] = useState([])
+  const [loading, setLoading] = useState(true)
 
- const [loading,setLoading] = useState(true)
+  useEffect(() => {
 
- useEffect(()=>{
+    if (!slug) return
 
-  const fetchCategoryNews = async()=>{
+    const fetchCategoryNews = async () => {
+      try {
+        const res = await api.get(`/news/category/${slug}`)
+        setNews(res.data)
+      } catch (err) {
+        console.error("Category fetch error:", err)
+      } finally {
+        setLoading(false)
+      }
+    }
 
-   try{
+    fetchCategoryNews()
 
-    const res = await api.get(`/news/category/${slug}`)
+  }, [slug])
 
-    setNews(res.data)
-
-   }catch(err){
-
-    console.error(err)
-
-   }
-
-   setLoading(false)
-
+  if (loading) {
+    return (
+      <div className="text-center py-20">
+        Loading news...
+      </div>
+    )
   }
 
-  fetchCategoryNews()
+  return (
+    <div className="max-w-7xl mx-auto px-4 py-10">
 
- },[slug])
+      <h1 className="text-3xl font-bold mb-8 capitalize">
+        {slug} News
+      </h1>
 
- if(loading){
-
-  return(
-
-   <div className="text-center py-20">
-
-    Loading news...
-
-   </div>
-
-  )
-
- }
-
- return(
-
-  <div className="max-w-7xl mx-auto px-4 py-10">
-
-   <h1 className="text-3xl font-bold mb-8 capitalize">
-
-    {slug} News
-
-   </h1>
-
-   {news.length === 0 ? (
-
-    <p>No news available</p>
-
-   ) : (
-
-    <div className="grid md:grid-cols-3 gap-6">
-
-     {news.map(item=>(
-      <NewsCard key={item._id} news={item}/>
-     ))}
+      {news.length === 0 ? (
+        <p>No news available</p>
+      ) : (
+        <div className="grid md:grid-cols-3 gap-6">
+          {news.map(item => (
+            <NewsCard key={item._id} news={item} />
+          ))}
+        </div>
+      )}
 
     </div>
-
-   )}
-
-  </div>
-
- )
+  )
 }

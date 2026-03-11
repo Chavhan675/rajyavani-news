@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import api from "../services/api"
+import api from "../lib/api"
 
 import HeroSection from "../components/HeroSection"
 import NewsCard from "../components/NewsCard"
@@ -18,7 +18,7 @@ export default function HomePage(){
 
    try{
 
-    const res = await api.get("/news")
+    const res = await api.get("/api/news")
 
     setNews(res.data)
 

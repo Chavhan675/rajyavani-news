@@ -16,7 +16,7 @@ export default function BreakingNews(){
 
    try{
 
-    const res = await api.get("/news")
+    const res = await api.get("/api/news")
 
     setNews(res.data.slice(0,5))
 

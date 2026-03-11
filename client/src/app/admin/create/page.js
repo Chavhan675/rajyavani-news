@@ -3,88 +3,78 @@
 import { useState } from "react"
 import api from "../../../lib/api"
 
-export default function CreateNewsPage(){
+export default function CreateNewsPage() {
 
- const [title,setTitle] = useState("")
- const [content,setContent] = useState("")
- const [category,setCategory] = useState("")
+  const [title, setTitle] = useState("")
+  const [content, setContent] = useState("")
+  const [category, setCategory] = useState("")
 
- const handleSubmit = async(e)=>{
+  const handleSubmit = async (e) => {
+    e.preventDefault()
 
-  e.preventDefault()
+    try {
+      await api.post("/news", {
+        title,
+        content,
+        category
+      })
 
-  try{
+      alert("News created successfully")
 
-   await api.post("/news",{
-    title,
-    content,
-    category
-   })
+      setTitle("")
+      setContent("")
+      setCategory("")
 
-   alert("News created successfully")
-
-   setTitle("")
-   setContent("")
-   setCategory("")
-
-  }catch(err){
-
-   console.error(err)
-
-   alert("Error creating news")
-
+    } catch (err) {
+      console.error(err)
+      alert("Error creating news")
+    }
   }
 
- }
+  return (
+    <div className="max-w-3xl mx-auto py-20">
 
- return(
+      <h1 className="text-3xl font-bold mb-6">
+        Create News Article
+      </h1>
 
-  <div className="max-w-3xl mx-auto py-20">
+      <form onSubmit={handleSubmit} className="space-y-4">
 
-   <h1 className="text-3xl font-bold mb-6">
+        <input
+          type="text"
+          placeholder="News Title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="border w-full p-2"
+          required
+        />
 
-    Create News Article
+        <textarea
+          placeholder="News Content"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          className="border w-full p-2 h-40"
+          required
+        />
 
-   </h1>
+        <input
+          type="text"
+          placeholder="Category"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          className="border w-full p-2"
+          required
+        />
 
-   <form onSubmit={handleSubmit} className="space-y-4">
+        <button
+          type="submit"
+          className="bg-red-600 text-white px-6 py-2"
+        >
+          Publish News
+        </button>
 
-    <input
-     type="text"
-     placeholder="News Title"
-     value={title}
-     onChange={(e)=>setTitle(e.target.value)}
-     className="border w-full p-2"
-     required
-    />
+      </form>
 
-    <textarea
-     placeholder="News Content"
-     value={content}
-     onChange={(e)=>setContent(e.target.value)}
-     className="border w-full p-2 h-40"
-     required
-    />
-
-    <input
-     type="text"
-     placeholder="Category"
-     value={category}
-     onChange={(e)=>setCategory(e.target.value)}
-     className="border w-full p-2"
-     required
-    />
-
-    <button
-     type="submit"
-     className="bg-red-600 text-white px-6 py-2"
-    >
-     Publish News
-    </button>
-
-   </form>
-
-  </div>
-
- )
+    </div>
+  )
 }

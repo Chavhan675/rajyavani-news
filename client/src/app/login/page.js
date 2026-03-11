@@ -4,79 +4,78 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import api from "../../lib/api"
 
-export default function LoginPage(){
+export default function LoginPage() {
 
- const router = useRouter()
+  const router = useRouter()
 
- const [email,setEmail] = useState("")
- const [password,setPassword] = useState("")
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
 
- const handleSubmit = async(e)=>{
+  const handleSubmit = async (e) => {
+    e.preventDefault()
 
-  e.preventDefault()
+    try {
 
-  try{
+      const res = await api.post("/auth/login", {
+        email,
+        password
+      })
 
-   const res = await api.post("/auth/login",{
-    email,
-    password
-   })
+      localStorage.setItem("token", res.data.token)
 
-   localStorage.setItem("token",res.data.token)
+      alert("Login successful")
 
-   alert("Login successful")
+      router.push("/")
 
-   router.push("/")
+    } catch (err) {
 
-  }catch(err){
+      console.error("Login error:", err)
 
-   alert(err.response?.data?.message || "Login failed")
+      alert(err.response?.data?.message || "Login failed")
 
+    }
   }
 
- }
+  return (
+    <div className="flex justify-center items-center min-h-screen bg-gray-100">
 
- return(
+      <div className="bg-white shadow-lg p-8 w-[400px] rounded">
 
-  <div className="flex justify-center items-center min-h-screen">
+        <h1 className="text-2xl font-bold mb-6 text-center">
+          Login
+        </h1>
 
-   <div className="bg-white shadow-lg p-8 w-[400px]">
+        <form onSubmit={handleSubmit} className="space-y-4">
 
-    <h1 className="text-2xl font-bold mb-6 text-center">
-     Login
-    </h1>
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="border p-2 w-full"
+            required
+          />
 
-    <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="border p-2 w-full"
+            required
+          />
 
-     <input
-      type="email"
-      placeholder="Email"
-      value={email}
-      onChange={(e)=>setEmail(e.target.value)}
-      className="border p-2 w-full"
-      required
-     />
+          <button
+            type="submit"
+            className="bg-red-600 text-white w-full py-2"
+          >
+            Login
+          </button>
 
-     <input
-      type="password"
-      placeholder="Password"
-      value={password}
-      onChange={(e)=>setPassword(e.target.value)}
-      className="border p-2 w-full"
-      required
-     />
+        </form>
 
-     <button
-      className="bg-red-600 text-white w-full py-2"
-     >
-      Login
-     </button>
+      </div>
 
-    </form>
-
-   </div>
-
-  </div>
-
- )
+    </div>
+  )
 }
