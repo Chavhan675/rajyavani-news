@@ -8,203 +8,200 @@ import NewsCard from "../components/NewsCard"
 import Sidebar from "../components/Sidebar"
 import AdBanner from "../components/AdBanner"
 
-export default function HomePage(){
+export default function HomePage() {
 
- const [news,setNews] = useState([])
+  const [news, setNews] = useState([])
+  const [loading, setLoading] = useState(true)
 
- useEffect(()=>{
+  useEffect(() => {
 
-  const fetchNews = async ()=>{
+    const fetchNews = async () => {
+      try {
 
-   try{
+        const res = await api.get("/api/news")
+        setNews(res.data || [])
 
-    const res = await api.get("/api/news")
+      } catch (err) {
 
-    setNews(res.data)
+        console.error("News fetch error:", err)
 
-   }catch(err){
+      } finally {
+        setLoading(false)
+      }
+    }
 
-    console.error(err)
+    fetchNews()
 
-   }
+  }, [])
 
+  if (loading) {
+    return (
+      <div className="text-center py-20 text-lg font-semibold">
+        Loading news...
+      </div>
+    )
   }
 
-  fetchNews()
+  return (
 
- },[])
+    <div className="max-w-7xl mx-auto px-4 py-6 space-y-16">
 
+      {/* HERO SECTION */}
 
-
- return(
-
-  <div className="max-w-7xl mx-auto px-4 py-6 space-y-16">
+      <HeroSection news={(news || []).slice(0, 5)} />
 
 
-   {/* HERO SECTION */}
+      {/* TOP AD */}
 
-   <HeroSection news={news.slice(0,5)} />
-
-
-   {/* TOP AD */}
-
-   <AdBanner position="top" />
+      <AdBanner position="top" />
 
 
-   {/* TOP STORIES */}
+      {/* TOP STORIES */}
 
-   <section>
+      <section>
 
-    <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-6">
 
-     <h2 className="text-2xl font-bold border-l-4 border-red-600 pl-3">
-      Top Stories
-     </h2>
+          <h2 className="text-2xl font-bold border-l-4 border-red-600 pl-3">
+            Top Stories
+          </h2>
 
-    </div>
+        </div>
 
-    <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-3 gap-6">
 
-     {news.slice(5,11).map(item =>(
+          {(news || []).slice(5, 11).map(item => (
 
-      <NewsCard
-       key={item._id}
-       news={item}
-      />
+            <NewsCard
+              key={item._id}
+              news={item}
+            />
 
-     ))}
+          ))}
 
-    </div>
+        </div>
 
-   </section>
-
-
-
-   {/* MAIN GRID */}
-
-   <div className="grid lg:grid-cols-4 gap-10">
-
-    {/* LEFT CONTENT */}
-
-    <div className="lg:col-span-3 space-y-14">
+      </section>
 
 
-     {/* MAHARASHTRA NEWS */}
+      {/* MAIN GRID */}
 
-     <section>
+      <div className="grid lg:grid-cols-4 gap-10">
 
-      <h2 className="text-2xl font-bold mb-6 border-l-4 border-red-600 pl-3">
-       Maharashtra News
-      </h2>
 
-      <div className="grid md:grid-cols-3 gap-6">
+        {/* LEFT CONTENT */}
 
-       {news
-        .filter(n => n.category?.name === "Maharashtra")
-        .slice(0,6)
-        .map(item =>(
+        <div className="lg:col-span-3 space-y-14">
 
-         <NewsCard
-          key={item._id}
-          news={item}
-         />
 
-        ))}
+          {/* MAHARASHTRA NEWS */}
+
+          <section>
+
+            <h2 className="text-2xl font-bold mb-6 border-l-4 border-red-600 pl-3">
+              Maharashtra News
+            </h2>
+
+            <div className="grid md:grid-cols-3 gap-6">
+
+              {(news || [])
+                .filter(n => n?.category?.name === "Maharashtra")
+                .slice(0, 6)
+                .map(item => (
+
+                  <NewsCard
+                    key={item._id}
+                    news={item}
+                  />
+
+                ))}
+
+            </div>
+
+          </section>
+
+
+          {/* BETWEEN NEWS AD */}
+
+          <AdBanner position="between" />
+
+
+          {/* POLITICS */}
+
+          <section>
+
+            <h2 className="text-2xl font-bold mb-6 border-l-4 border-red-600 pl-3">
+              Politics
+            </h2>
+
+            <div className="grid md:grid-cols-3 gap-6">
+
+              {(news || [])
+                .filter(n => n?.category?.name === "Politics")
+                .slice(0, 6)
+                .map(item => (
+
+                  <NewsCard
+                    key={item._id}
+                    news={item}
+                  />
+
+                ))}
+
+            </div>
+
+          </section>
+
+
+          {/* SPORTS */}
+
+          <section>
+
+            <h2 className="text-2xl font-bold mb-6 border-l-4 border-red-600 pl-3">
+              Sports
+            </h2>
+
+            <div className="grid md:grid-cols-3 gap-6">
+
+              {(news || [])
+                .filter(n => n?.category?.name === "Sports")
+                .slice(0, 6)
+                .map(item => (
+
+                  <NewsCard
+                    key={item._id}
+                    news={item}
+                  />
+
+                ))}
+
+            </div>
+
+          </section>
+
+        </div>
+
+
+        {/* SIDEBAR */}
+
+        <div className="space-y-10">
+
+          <Sidebar />
+
+          {/* SIDEBAR AD */}
+
+          <AdBanner position="sidebar" />
+
+        </div>
 
       </div>
 
-     </section>
 
+      {/* FOOTER AD */}
 
-
-     {/* BETWEEN NEWS AD */}
-
-     <AdBanner position="between" />
-
-
-
-     {/* POLITICS */}
-
-     <section>
-
-      <h2 className="text-2xl font-bold mb-6 border-l-4 border-red-600 pl-3">
-       Politics
-      </h2>
-
-      <div className="grid md:grid-cols-3 gap-6">
-
-       {news
-        .filter(n => n.category?.name === "Politics")
-        .slice(0,6)
-        .map(item =>(
-
-         <NewsCard
-          key={item._id}
-          news={item}
-         />
-
-        ))}
-
-      </div>
-
-     </section>
-
-
-
-     {/* SPORTS */}
-
-     <section>
-
-      <h2 className="text-2xl font-bold mb-6 border-l-4 border-red-600 pl-3">
-       Sports
-      </h2>
-
-      <div className="grid md:grid-cols-3 gap-6">
-
-       {news
-        .filter(n => n.category?.name === "Sports")
-        .slice(0,6)
-        .map(item =>(
-
-         <NewsCard
-          key={item._id}
-          news={item}
-         />
-
-        ))}
-
-      </div>
-
-     </section>
-
+      <AdBanner position="footer" />
 
     </div>
 
-
-
-    {/* SIDEBAR */}
-
-    <div className="space-y-10">
-
-     <Sidebar/>
-
-     {/* SIDEBAR AD */}
-
-     <AdBanner position="sidebar" />
-
-    </div>
-
-   </div>
-
-
-
-   {/* FOOTER AD */}
-
-   <AdBanner position="footer" />
-
-
-  </div>
-
- )
-
+  )
 }

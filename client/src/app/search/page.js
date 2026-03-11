@@ -1,59 +1,86 @@
 "use client"
 
+import { Suspense, useEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
-import { useEffect,useState } from "react"
 import api from "../../services/api"
 import NewsCard from "../../components/NewsCard"
 
-export default function SearchPage(){
+function SearchContent() {
 
- const params = useSearchParams()
- const query = params.get("q")
+  const params = useSearchParams()
+  const query = params.get("q")
 
- const [results,setResults]=useState([])
+  const [results, setResults] = useState([])
+  const [loading, setLoading] = useState(true)
 
- useEffect(()=>{
+  useEffect(() => {
 
-  const fetchResults=async()=>{
+    const fetchResults = async () => {
 
-   try{
+      try {
 
-    const res = await api.get(`/search?q=${query}`)
+        const res = await api.get(`/api/search?q=${query}`)
+        setResults(res.data || [])
 
-    setResults(res.data)
+      } catch (err) {
 
-   }catch(err){
-    console.error(err)
-   }
+        console.error("Search error:", err)
 
+      } finally {
+
+        setLoading(false)
+
+      }
+
+    }
+
+    if (query) {
+      fetchResults()
+    }
+
+  }, [query])
+
+  if (loading) {
+    return (
+      <div className="text-center py-20 text-lg font-semibold">
+        Searching news...
+      </div>
+    )
   }
 
-  if(query){
-   fetchResults()
-  }
+  return (
 
- },[query])
+    <div className="max-w-7xl mx-auto px-4 py-8">
 
- return(
+      <h1 className="text-2xl font-bold mb-6">
+        Search results for: {query}
+      </h1>
 
-  <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="grid md:grid-cols-3 gap-6">
 
-   <h1 className="text-2xl font-bold mb-6">
+        {results.length > 0 ? (
 
-    Search results for: {query}
+          results.map(item => (
+            <NewsCard key={item._id} news={item} />
+          ))
 
-   </h1>
+        ) : (
 
-   <div className="grid md:grid-cols-3 gap-6">
+          <p>No news found.</p>
 
-    {results.map(item=>(
-     <NewsCard key={item._id} news={item}/>
-    ))}
+        )}
 
-   </div>
+      </div>
 
-  </div>
+    </div>
 
- )
+  )
+}
 
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<div className="text-center py-20">Loading search...</div>}>
+      <SearchContent />
+    </Suspense>
+  )
 }
