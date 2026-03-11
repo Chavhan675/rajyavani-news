@@ -1,8 +1,8 @@
 "use client"
 
-export const dynamic = "force-dynamic"
-
 import { useState } from "react"
+
+export const dynamic = "force-dynamic"
 
 export default function Signup() {
 
@@ -33,6 +33,7 @@ export default function Signup() {
     }catch(err){
       console.log(err)
     }
+
   }
 
   return(
@@ -44,24 +45,24 @@ export default function Signup() {
       <form onSubmit={handleSubmit}>
 
         <input
-          type="text"
-          placeholder="Name"
-          value={name}
-          onChange={(e)=>setName(e.target.value)}
+        type="text"
+        placeholder="Name"
+        value={name}
+        onChange={(e)=>setName(e.target.value)}
         />
 
         <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e)=>setEmail(e.target.value)}
+        type="email"
+        placeholder="Email"
+        value={email}
+        onChange={(e)=>setEmail(e.target.value)}
         />
 
         <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e)=>setPassword(e.target.value)}
+        type="password"
+        placeholder="Password"
+        value={password}
+        onChange={(e)=>setPassword(e.target.value)}
         />
 
         <button type="submit">Signup</button>
@@ -71,4 +72,5 @@ export default function Signup() {
     </div>
 
   )
+
 }

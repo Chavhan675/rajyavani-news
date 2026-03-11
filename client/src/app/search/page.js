@@ -1,86 +1,60 @@
 "use client"
 
-import { Suspense, useEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
-import api from "../../services/api"
+import { useEffect,useState } from "react"
+import api from "../../lib/api"
 import NewsCard from "../../components/NewsCard"
 
-function SearchContent() {
+export const dynamic = "force-dynamic"
 
-  const params = useSearchParams()
-  const query = params.get("q")
+export default function SearchPage(){
 
-  const [results, setResults] = useState([])
-  const [loading, setLoading] = useState(true)
+ const params = useSearchParams()
+ const query = params.get("q")
 
-  useEffect(() => {
+ const [results,setResults]=useState([])
 
-    const fetchResults = async () => {
+ useEffect(()=>{
 
-      try {
+  const fetchResults=async()=>{
 
-        const res = await api.get(`/api/search?q=${query}`)
-        setResults(res.data || [])
+   try{
 
-      } catch (err) {
+    const res = await api.get(`/api/search?q=${query}`)
 
-        console.error("Search error:", err)
+    setResults(res.data)
 
-      } finally {
+   }catch(err){
+    console.error(err)
+   }
 
-        setLoading(false)
-
-      }
-
-    }
-
-    if (query) {
-      fetchResults()
-    }
-
-  }, [query])
-
-  if (loading) {
-    return (
-      <div className="text-center py-20 text-lg font-semibold">
-        Searching news...
-      </div>
-    )
   }
 
-  return (
+  if(query){
+   fetchResults()
+  }
 
-    <div className="max-w-7xl mx-auto px-4 py-8">
+ },[query])
 
-      <h1 className="text-2xl font-bold mb-6">
-        Search results for: {query}
-      </h1>
+ return(
 
-      <div className="grid md:grid-cols-3 gap-6">
+  <div className="max-w-7xl mx-auto px-4 py-8">
 
-        {results.length > 0 ? (
+   <h1 className="text-2xl font-bold mb-6">
 
-          results.map(item => (
-            <NewsCard key={item._id} news={item} />
-          ))
+    Search results for: {query}
 
-        ) : (
+   </h1>
 
-          <p>No news found.</p>
+   <div className="grid md:grid-cols-3 gap-6">
 
-        )}
+    {results.map(item=>(
+     <NewsCard key={item._id} news={item}/>
+    ))}
 
-      </div>
+   </div>
 
-    </div>
+  </div>
 
-  )
-}
-
-export default function SearchPage() {
-  return (
-    <Suspense fallback={<div className="text-center py-20">Loading search...</div>}>
-      <SearchContent />
-    </Suspense>
-  )
+ )
 }
